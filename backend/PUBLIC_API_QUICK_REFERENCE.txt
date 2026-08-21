@@ -1,0 +1,24 @@
+IMIGANI API QUICK REFERENCE
+
+Base URL:
+  http://127.0.0.1:5055
+
+Method:
+  POST
+
+Endpoint:
+  /
+
+Body:
+  { "command": "COMMAND_NAME", "data": {} }
+
+Useful commands:
+  AVAILABLE_REQUESTS
+  HEALTH
+  LOGIN
+  DASHBOARD_SUMMARY
+  LIST_TOUR_CATEGORIES
+  LIST_TOURS
+  CREATE_INQUIRY
+  CREATE_TRIP_PLAN
+  LIST_DESTINATIONS
