@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `accommodations` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
-  `location` varchar(255) DEFAULT NULL,clear
+  `location` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `image_url` varchar(500) DEFAULT NULL,
   `website_url` varchar(500) DEFAULT NULL,
