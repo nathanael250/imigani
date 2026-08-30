@@ -184,6 +184,8 @@ const durationFilters = [
   { id: '15+', label: '15+ Days', max: Infinity, min: 15 },
 ]
 
+const toursPerPage = 6
+
 function Tours() {
   const { openPlanVisit } = usePlanVisit()
   const [apiCategories, setApiCategories] = useState([])
@@ -193,6 +195,7 @@ function Tours() {
   const [selectedMaxPrice, setSelectedMaxPrice] = useState(null)
   const [sortBy, setSortBy] = useState('recommended')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     let isMounted = true
@@ -254,6 +257,14 @@ function Tours() {
     })
   }, [activeMaxPrice, selectedCategories, selectedDurations, sortBy, tours])
 
+  const totalPages = Math.max(1, Math.ceil(visibleTours.length / toursPerPage))
+  const activePage = Math.min(currentPage, totalPages)
+  const paginatedTours = useMemo(() => {
+    const startIndex = (activePage - 1) * toursPerPage
+    return visibleTours.slice(startIndex, startIndex + toursPerPage)
+  }, [activePage, visibleTours])
+  const paginationPages = Array.from({ length: totalPages }, (_, index) => index + 1)
+
   return (
     <>
       <section className="tours-hero relative isolate flex min-h-[220px] items-center overflow-hidden px-5 text-white">
@@ -298,13 +309,19 @@ function Tours() {
                 title="Categories"
                 items={categoryOptions}
                 selectedItems={selectedCategories}
-                onToggle={(category) => toggleSetValue(setSelectedCategories, category)}
+                onToggle={(category) => {
+                  toggleSetValue(setSelectedCategories, category)
+                  setCurrentPage(1)
+                }}
               />
               <FilterGroup
                 title="Duration"
                 items={durationOptions}
                 selectedItems={selectedDurations}
-                onToggle={(duration) => toggleSetValue(setSelectedDurations, duration)}
+                onToggle={(duration) => {
+                  toggleSetValue(setSelectedDurations, duration)
+                  setCurrentPage(1)
+                }}
               />
 
               <div className="tours-filter-group">
@@ -319,7 +336,10 @@ function Tours() {
                     step={getPriceStep(priceRange)}
                     value={activeMaxPrice}
                     disabled={priceRange.max <= 0}
-                    onChange={(event) => setSelectedMaxPrice(Number(event.target.value))}
+                    onChange={(event) => {
+                      setSelectedMaxPrice(Number(event.target.value))
+                      setCurrentPage(1)
+                    }}
                   />
                 </label>
                 <div className="tours-range-values">
@@ -336,6 +356,7 @@ function Tours() {
                   setSelectedCategories(new Set())
                   setSelectedDurations(new Set())
                   setSelectedMaxPrice(priceRange.max || null)
+                  setCurrentPage(1)
                 }}
               >
                 Clear Filters
@@ -346,11 +367,18 @@ function Tours() {
           <div className="min-w-0">
             <div className="tours-toolbar">
               <p>
-                Showing {visibleTours.length} of {tours.length} curated journeys
+                Showing {paginatedTours.length} of {visibleTours.length} curated journeys
               </p>
               <label>
                 <span>Sort by</span>
-                <select value={sortBy} aria-label="Sort tours" onChange={(event) => setSortBy(event.target.value)}>
+                <select
+                  value={sortBy}
+                  aria-label="Sort tours"
+                  onChange={(event) => {
+                    setSortBy(event.target.value)
+                    setCurrentPage(1)
+                  }}
+                >
                   <option value="recommended">Recommended</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="duration">Duration</option>
@@ -358,9 +386,9 @@ function Tours() {
               </label>
             </div>
 
-            {visibleTours.length > 0 ? (
+            {paginatedTours.length > 0 ? (
               <div className="tours-grid">
-                {visibleTours.map((tour) => (
+                {paginatedTours.map((tour) => (
                   <TourCard tour={tour} key={tour.id || tour.title} />
                 ))}
               </div>
@@ -371,24 +399,37 @@ function Tours() {
               </div>
             )}
 
-            <nav className="tours-pagination" aria-label="Tours pagination">
-              {[1, 2, 3].map((page) => (
+            {totalPages > 1 && (
+              <nav className="tours-pagination" aria-label="Tours pagination">
+                {paginationPages.map((page) => (
+                  <button
+                    type="button"
+                    className={`tours-page-number ${page === activePage ? 'tours-page-number-active' : ''}`}
+                    key={page}
+                    aria-current={page === activePage ? 'page' : undefined}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
                 <button
                   type="button"
-                  className={`tours-page-number ${page === 1 ? 'tours-page-number-active' : ''}`}
-                  key={page}
-                  aria-current={page === 1 ? 'page' : undefined}
+                  className="tours-page-control"
+                  disabled={activePage === totalPages}
+                  onClick={() => setCurrentPage((page) => Math.min(page + 1, totalPages))}
                 >
-                  {page}
+                  Next
                 </button>
-              ))}
-              <button type="button" className="tours-page-control">
-                Next
-              </button>
-              <button type="button" className="tours-page-control">
-                Last
-              </button>
-            </nav>
+                <button
+                  type="button"
+                  className="tours-page-control"
+                  disabled={activePage === totalPages}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  Last
+                </button>
+              </nav>
+            )}
 
             <section className="tours-helper-band">
               <div>

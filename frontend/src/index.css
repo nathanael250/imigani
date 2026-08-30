@@ -1603,6 +1603,128 @@ button {
 }
 
 @media (max-width: 1023px) {
+  .top-header {
+    height: 64px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .logo-link {
+    justify-content: flex-start;
+  }
+
+  .logo-link img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
+  }
+
+  .contact-row,
+  .social-row {
+    display: none;
+  }
+
+  .social-link {
+    width: 25px;
+    height: 25px;
+    font-size: 8px;
+  }
+
+  .nav-band {
+    display: none;
+    box-shadow: 0 18px 30px rgb(11 42 18 / 0.18);
+  }
+
+  .site-header.is-menu-open .nav-band {
+    display: block;
+  }
+
+  .nav-inner {
+    align-items: stretch;
+    gap: 14px;
+    padding-top: 16px;
+    padding-bottom: 18px;
+  }
+
+  .nav-links {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    text-align: left;
+  }
+
+  .nav-link {
+    min-height: 38px;
+    border: 1px solid rgb(255 255 255 / 0.13);
+    border-radius: 6px;
+    padding: 9px 10px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .nav-link::after {
+    display: none;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .language-menu,
+  .language-menu-button {
+    min-height: 36px;
+    flex: 1 1 auto;
+  }
+
+  .language-menu-button {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .language-menu-list {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  .plan-button {
+    flex: 1 1 auto;
+    min-height: 34px;
+    padding: 0 15px;
+    font-size: 12px;
+  }
+
+  .mobile-menu-extras {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    color: rgb(255 255 255 / 0.82);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .mobile-menu-extras > a {
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .mobile-social-row {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: 7px;
+  }
+
   .destinations-section {
     padding-top: 86px;
     padding-bottom: 92px;
@@ -2034,6 +2156,40 @@ button {
 
   .destinations-section {
     padding-bottom: 118px;
+  }
+
+  .destinations-composition,
+  .destinations-left,
+  .destinations-right,
+  .destinations-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .destinations-composition {
+    width: min(100%, 420px);
+    margin: 34px auto 0;
+  }
+
+  .destinations-intro {
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  .destinations-intro h3 {
+    max-width: 340px;
+    margin: 0 auto;
+    font-size: 30px;
+    line-height: 1.16;
+  }
+
+  .destinations-intro p {
+    max-width: 320px;
+    margin: 14px auto 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
   }
 
   .destination-rwanda,
@@ -3589,7 +3745,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  margin-top: 48px;
+  margin-top: 24px;
 }
 
 .tours-page-number,
@@ -3623,6 +3779,13 @@ button {
   transform: translateY(-1px);
 }
 
+.tours-page-number:disabled,
+.tours-page-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
+
 .tours-page-number-active,
 .tours-page-number-active:hover {
   border-color: var(--deep-green);
@@ -3635,7 +3798,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  margin-top: 50px;
+  margin-top: 34px;
   border-radius: 8px;
   background:
     linear-gradient(90deg, rgb(11 42 18 / 0.95), rgb(16 47 22 / 0.9)),
