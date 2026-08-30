@@ -267,30 +267,32 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
         </div>
       </section>
 
-      <section id="destinations" className="destinations-section bg-white px-5">
-        <div className="destinations-shell mx-auto">
+      <section id="destinations" className="scroll-mt-6 bg-white px-5 py-16 sm:py-20 lg:py-[106px]">
+        <div className="mx-auto max-w-[1120px]">
           <div className="home-reveal text-center">
-            <h2 className="destinations-heading">Destinations</h2>
-            <span className="destinations-underline" />
+            <h2 className="text-[38px] font-bold leading-[1.05] text-[#050505] sm:text-[48px] lg:text-[62px]">
+              Destinations
+            </h2>
+            <span className="mx-auto mt-4 block h-[6px] w-[92px] rounded-[8px] bg-[#d3a14e]" />
           </div>
 
-          <div className="destinations-composition">
-            <div className="destinations-left home-reveal" style={{ '--reveal-delay': '100ms' }}>
-              <div className="destinations-intro">
-                <h3>
+          <div className="mt-9 grid gap-5 sm:mt-11 lg:mt-14 lg:grid-cols-[minmax(0,0.47fr)_minmax(0,0.53fr)] lg:items-stretch">
+            <div className="home-reveal grid gap-5" style={{ '--reveal-delay': '100ms' }}>
+              <div className="text-center text-[#0b0b0b] lg:mb-2 lg:text-left">
+                <h3 className="mx-auto max-w-[340px] text-[30px] font-bold leading-[1.16] sm:max-w-[500px] sm:text-[36px] lg:mx-0 lg:text-[43px]">
                   Discover East Africa
-                  <span>Through Its Stories</span>
+                  <span className="block">Through Its Stories</span>
                 </h3>
-                <p>
+                <p className="mx-auto mt-4 max-w-[320px] text-[15px] font-semibold leading-[1.5] text-[#151515] sm:max-w-[500px] sm:text-[18px] lg:mx-0 lg:mt-6 lg:text-[23px]">
                   Four Countries, Different landscapes,
-                  <span>Diverse cultures, Countless stories</span>
+                  <span className="block">Diverse cultures, Countless stories</span>
                 </p>
               </div>
               <DestinationCard destination={destinations[0]} />
             </div>
 
-            <div className="destinations-right home-reveal" style={{ '--reveal-delay': '220ms' }}>
-              <div className="destinations-pair">
+            <div className="home-reveal grid gap-5 lg:grid-rows-[minmax(0,1fr)_183px]" style={{ '--reveal-delay': '220ms' }}>
+              <div className="grid gap-5 sm:grid-cols-2">
                 <DestinationCard destination={destinations[1]} />
                 <DestinationCard destination={destinations[2]} />
               </div>
