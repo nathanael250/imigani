@@ -17,6 +17,7 @@ import rwandaImage from '../assets/Rwanda.png'
 import tanzaniaImage from '../assets/Tanzania.png'
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
+const uploadBaseUrl = getUploadBaseUrl()
 
 const fallbackTours = [
   {
@@ -472,7 +473,17 @@ function TourCard({ tour }) {
   return (
     <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-[8px] border border-[#0b2a12]/11 bg-white shadow-[0_15px_34px_rgba(11,42,18,0.08)] transition hover:-translate-y-1 hover:border-[#c6923d]/40 hover:shadow-[0_24px_46px_rgba(11,42,18,0.15)]">
       <Link className="relative block h-[220px] overflow-hidden bg-[#d7e3d8] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,rgba(7,24,11,0.1),rgba(7,24,11,0.36))] sm:h-[178px]" to={detailPath} aria-label={tour.title}>
-        <img className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.045]" src={tour.image} alt={tour.alt} />
+        <img
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.045]"
+          src={tour.image || gorillaImage}
+          alt={tour.alt}
+          loading="lazy"
+          onError={(event) => {
+            if (event.currentTarget.src !== gorillaImage) {
+              event.currentTarget.src = gorillaImage
+            }
+          }}
+        />
         <span className="absolute bottom-[13px] left-[13px] z-[1] max-w-[calc(100%-62px)] rounded bg-white/95 px-[9px] py-[7px] text-[10px] font-bold leading-[1.1] text-[#102f16]">
           {tour.category}
         </span>
@@ -662,15 +673,36 @@ function plainTextSummary(value, maxLength = 130) {
 }
 
 function mediaPreviewUrl(url) {
-  if (!url || url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+  if (!url || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url
+  }
+
+  if (/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/uploads/i.test(url)) {
+    return `${uploadBaseUrl}${new URL(url).pathname}`
+  }
+
+  if (url.startsWith('http')) {
     return url
   }
 
   if (url.startsWith('/uploads')) {
-    return `${apiBaseUrl}${url}`
+    return `${uploadBaseUrl}${url}`
   }
 
   return url
+}
+
+function getUploadBaseUrl() {
+  if (typeof window === 'undefined') {
+    return apiBaseUrl
+  }
+
+  const apiHost = new URL(apiBaseUrl, window.location.origin).hostname
+  const pageHost = window.location.hostname
+  const apiIsLocal = apiHost === '127.0.0.1' || apiHost === 'localhost'
+  const pageIsLocal = pageHost === '127.0.0.1' || pageHost === 'localhost'
+
+  return apiIsLocal && !pageIsLocal ? '' : apiBaseUrl
 }
 
 function slugify(value) {

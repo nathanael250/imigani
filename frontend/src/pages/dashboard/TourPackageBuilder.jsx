@@ -46,6 +46,17 @@ const steps = [
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || "http://127.0.0.1:6003").replace(/\/$/, "");
 
+const dashboardInlineErrorClass = "rounded-md bg-[#fff1ed] px-[14px] py-3 text-[13px] font-black text-[#9b2f20]";
+const builderButtonClass =
+  "inline-flex min-h-[42px] items-center justify-center gap-[9px] whitespace-nowrap rounded-md border border-[#dfe5da] bg-white px-[17px] text-[13px] font-semibold text-[#142819] transition hover:-translate-y-px hover:border-[#c6923d]/55 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0";
+const builderPrimaryButtonClass =
+  "inline-flex min-h-[42px] items-center justify-center gap-[9px] whitespace-nowrap rounded-md border border-[#0b2a12] bg-[#0b2a12] px-[17px] text-[13px] font-semibold text-white transition hover:-translate-y-px hover:bg-[#14381d] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0";
+const builderInputClass =
+  "w-full rounded-md border border-[#dce4d8] bg-white px-[13px] py-3 text-[13px] font-medium text-[#142319] outline-none transition focus:border-[#d3a14e] focus:ring-4 focus:ring-[#d3a14e]/20";
+const builderLabelClass = "grid gap-2 text-[13px] font-semibold text-[#253329]";
+const builderEmptyStateClass =
+  "grid min-h-[230px] place-items-center content-center gap-2.5 rounded-[8px] border border-dashed border-[#d8e0d5] bg-[#fbfcfa] p-8 text-center";
+
 const emptyDraft = {
   basic: {
     category_id: "",
@@ -275,64 +286,66 @@ function TourPackageBuilder() {
   }
 
   return (
-    <section className="tour-builder-page" aria-label={isEditing ? "Edit tour package" : "Add new tour package"}>
-      <div className="tour-builder-titlebar">
+    <section className="grid gap-4" aria-label={isEditing ? "Edit tour package" : "Add new tour package"}>
+      <div className="flex items-center justify-between gap-[18px] max-[760px]:grid">
         <div>
-          <div className="tour-builder-crumbs">
+          <div className="mb-3 flex flex-wrap items-center gap-2.5 text-[12px] font-medium text-[#7c857d]">
             <Link to="/dashboard">Dashboard</Link>
             <span>/</span>
             <Link to="/dashboard/tour-packages">Tour Packages</Link>
             <span>/</span>
             <strong>{isEditing ? "Edit Tour" : "Add New Tour"}</strong>
           </div>
-          <h2>{isEditing ? "Edit Tour Package" : "Add New Tour Package"}</h2>
-          <p>{isEditing ? "Update this tour package and keep every detail in sync." : "Create a new tour package and manage all the details."}</p>
+          <h2 className="m-0 text-[clamp(28px,2.7vw,38px)] font-semibold leading-tight text-[#0d3518]">{isEditing ? "Edit Tour Package" : "Add New Tour Package"}</h2>
+          <p className="mt-2 text-sm font-medium text-[#687265]">{isEditing ? "Update this tour package and keep every detail in sync." : "Create a new tour package and manage all the details."}</p>
         </div>
 
-        <div className="tour-builder-actions">
-          <button type="button" onClick={() => savePackage("draft")} disabled={isSaving}>
-            <Save aria-hidden="true" />
+        <div className="flex items-center gap-3 max-[760px]:grid max-[760px]:grid-cols-2 max-[420px]:grid-cols-1">
+          <button className={builderButtonClass} type="button" onClick={() => savePackage("draft")} disabled={isSaving}>
+            <Save className="h-4 w-4" aria-hidden="true" />
             Save Draft
           </button>
           <button
-            className="is-primary"
+            className={builderPrimaryButtonClass}
             type="button"
             onClick={() => (activeStep === steps.length - 1 ? savePackage("published") : setActiveStep(activeStep + 1))}
             disabled={isSaving}
           >
             {activeStep === steps.length - 1 ? "Review & Publish" : "Next Step"}
-            <ArrowRight aria-hidden="true" />
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      <div className="tour-stepper">
+      <div className="grid grid-cols-6 gap-3 rounded-[8px] border border-[#e1e7dc] bg-white px-[26px] py-[23px] shadow-[0_14px_30px_rgba(18,53,27,0.06)] max-[920px]:grid-cols-3 max-[560px]:grid-cols-2 max-[420px]:grid-cols-1">
         {steps.map((step, index) => (
           <button
-            className={`${index === activeStep ? "is-active" : ""}${index < activeStep ? " is-complete" : ""}`}
+            className="grid place-items-center gap-2.5 text-center text-[12px] font-semibold text-[#4f5b52]"
             type="button"
             onClick={() => setActiveStep(index)}
             key={step}
           >
-            <span>{index < activeStep ? <Check aria-hidden="true" /> : index + 1}</span>
-            <small>{step}</small>
+            <span className={`grid h-[38px] w-[38px] place-items-center rounded-full text-[13px] ${
+              index <= activeStep ? "bg-[#0b2a12] text-white" : "bg-[#e1e3e2] text-[#142819]"
+            }`}>{index < activeStep ? <Check className="h-4 w-4" aria-hidden="true" /> : index + 1}</span>
+            <small className={`${index === activeStep ? "text-[#0d3518]" : ""}`}>{step}</small>
           </button>
         ))}
       </div>
 
-      {error && <p className="dashboard-inline-error">{error}</p>}
+      {error && <p className={dashboardInlineErrorClass}>{error}</p>}
 
-      <div className="tour-builder-card">
+      <div className="rounded-[8px] border border-[#e1e7dc] bg-white shadow-[0_14px_30px_rgba(18,53,27,0.06)]">
         {isLoadingPackage && (
-          <div className="dashboard-empty-state">
-            <Package aria-hidden="true" />
-            <strong>Loading tour package</strong>
-            <span>Please wait while we bring the saved details back into the form.</span>
+          <div className={builderEmptyStateClass}>
+            <Package className="h-[42px] w-[42px] text-[#0b2a12]" aria-hidden="true" />
+            <strong className="text-lg font-black text-[#0b2a12]">Loading tour package</strong>
+            <span className="max-w-[420px] text-sm font-bold text-[#687265]">Please wait while we bring the saved details back into the form.</span>
           </div>
         )}
 
         {!isLoadingPackage && (
-          <>
+          <div className="p-6 max-[640px]:p-4">
         {activeStep === 0 && (
           <BasicStep
             basic={draft.basic}
@@ -385,21 +398,21 @@ function TourPackageBuilder() {
             removeItem={removeItem}
           />
         )}
-          </>
+          </div>
         )}
 
-        <div className="tour-builder-footer">
-          <button type="button" onClick={() => setActiveStep(Math.max(activeStep - 1, 0))}>
-            <ArrowLeft aria-hidden="true" />
+        <div className="flex items-center justify-between gap-3 border-t border-[#e3e9df] px-5 py-4 max-[760px]:grid max-[760px]:grid-cols-1">
+          <button className={builderButtonClass} type="button" onClick={() => setActiveStep(Math.max(activeStep - 1, 0))}>
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Previous Step
           </button>
-          <div>
-            <button type="button" onClick={() => savePackage("draft")} disabled={isSaving}>
-              <Save aria-hidden="true" />
+          <div className="flex items-center justify-end gap-3 max-[760px]:grid max-[760px]:grid-cols-2 max-[420px]:grid-cols-1">
+            <button className={builderButtonClass} type="button" onClick={() => savePackage("draft")} disabled={isSaving}>
+              <Save className="h-4 w-4" aria-hidden="true" />
               Save Draft
             </button>
             <button
-              className="is-primary"
+              className={builderPrimaryButtonClass}
               type="button"
               onClick={() =>
                 activeStep === steps.length - 1 ? savePackage("published") : setActiveStep(activeStep + 1)
@@ -407,7 +420,7 @@ function TourPackageBuilder() {
               disabled={isSaving}
             >
               {activeStep === steps.length - 1 ? "Review & Publish" : "Next Step"}
-              <ArrowRight aria-hidden="true" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -425,11 +438,11 @@ function BasicStep({ basic, categories, updateBasic, updateBasicField }) {
           Add the basic details about the tour package.
         </p>
       </header>
-      <div className="tour-form-grid">
+      <div className="grid gap-x-[18px] gap-y-4 md:grid-cols-2">
         <FormInput label="Tour Name" name="name" value={basic.name} onChange={updateBasic} required />
-        <label>
+        <label className={builderLabelClass}>
           Tour Category *
-          <select name="category_id" value={basic.category_id} onChange={updateBasic}>
+          <select className={builderInputClass} name="category_id" value={basic.category_id} onChange={updateBasic}>
             <option value="">Select a category</option>
             {categories.map((category) => (
               <option value={category.id} key={category.id}>
@@ -440,7 +453,7 @@ function BasicStep({ basic, categories, updateBasic, updateBasicField }) {
         </label>
         <FormInput label="Duration (Days)" name="duration_days" value={basic.duration_days} onChange={updateBasic} required />
         <FormInput label="Duration (Nights)" name="duration_nights" value={basic.duration_nights} onChange={updateBasic} />
-        <div className="tour-form-wide grid gap-2">
+        <div className="grid gap-2 md:col-span-2">
           <span className="text-[13px] font-black text-[#253329]">Description *</span>
           <RichTextEditor
             value={basic.description}
@@ -551,7 +564,7 @@ function HighlightsDestinationsStep({ destinations, draft, selectedDestinationId
         {draft.highlights.map((highlight, index) => (
           <div className="mb-2.5 grid grid-cols-[44px_minmax(0,1fr)_40px] items-center gap-3 rounded-lg border border-[#e3e9df] bg-[#fbfcfa] p-3" key={index}>
             <span className="grid h-[34px] w-[34px] place-items-center rounded-md bg-[#e4f2e6] text-[13px] font-black text-[#0c4a23]">{index + 1}</span>
-            <input value={highlight.title} onChange={(event) => updateArray("highlights", index, "title", event.target.value)} placeholder="Gorilla Trekking" />
+            <input className={builderInputClass} value={highlight.title} onChange={(event) => updateArray("highlights", index, "title", event.target.value)} placeholder="Gorilla Trekking" />
             <IconButton onClick={() => removeItem("highlights", index)} />
           </div>
         ))}
@@ -654,9 +667,9 @@ function PricingStep({ currencies, prices, addItem, removeItem, updateArray }) {
       <SectionHeader title="Pricing" copy="Add the package price and a helpful note for travelers." />
       {prices.map((price, index) => (
         <div className="grid gap-4 rounded-lg border border-[#dce4d8] bg-white p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]" key={index}>
-          <label>
+          <label className={builderLabelClass}>
             Currency
-            <select value={price.currency_id} onChange={(event) => updateArray("prices", index, "currency_id", event.target.value)}>
+            <select className={builderInputClass} value={price.currency_id} onChange={(event) => updateArray("prices", index, "currency_id", event.target.value)}>
               <option value="">Select</option>
               {currencies.map((currency) => (
                 <option value={currency.id} key={currency.id}>
@@ -671,9 +684,10 @@ function PricingStep({ currencies, prices, addItem, removeItem, updateArray }) {
               <IconButton onClick={() => removeItem("prices", index)} />
             </div>
           )}
-          <label className="md:col-span-3">
+          <label className={`${builderLabelClass} md:col-span-3`}>
             Price Note
             <textarea
+              className={`${builderInputClass} resize-y`}
               value={price.price_note}
               onChange={(event) => updateArray("prices", index, "price_note", event.target.value)}
               placeholder="Example: Price is per person based on double occupancy."
@@ -890,7 +904,7 @@ function MediaReviewStep({ draft, updateArray, addItem, removeItem }) {
           Tour Video (Optional)
           <span className="-mt-1 text-[12px] font-bold text-[#687265]">Add a YouTube or Vimeo link to showcase your tour.</span>
           <div className="relative">
-            <input className="pr-10" value={videoUrl} onChange={(event) => updateVideoUrl(event.target.value)} placeholder="Paste YouTube or Vimeo link here..." />
+            <input className={`${builderInputClass} pr-10`} value={videoUrl} onChange={(event) => updateVideoUrl(event.target.value)} placeholder="Paste YouTube or Vimeo link here..." />
             <LinkIcon className="absolute bottom-3 right-3 h-[18px] w-[18px] text-[#52615a]" aria-hidden="true" />
           </div>
         </label>
@@ -975,26 +989,26 @@ function SummaryItem({ label, value, isStatus = false }) {
 
 function SectionHeader({ title, copy }) {
   return (
-    <header className="tour-section-header">
-      <h3>{title}</h3>
-      <p>{copy}</p>
+    <header className="mb-4">
+      <h3 className="m-0 text-[19px] font-semibold text-[#162a1a]">{title}</h3>
+      <p className="mt-1.5 text-[13px] font-medium text-[#687265]">{copy}</p>
     </header>
   );
 }
 
 function FormInput({ label, ...inputProps }) {
   return (
-    <label>
+    <label className={builderLabelClass}>
       {label}
-      <input {...inputProps} />
+      <input className={builderInputClass} {...inputProps} />
     </label>
   );
 }
 
 function AddButton({ children, onClick }) {
   return (
-    <button className="tour-add-button" type="button" onClick={onClick}>
-      <Plus aria-hidden="true" />
+    <button className={`${builderButtonClass} mt-2.5 border-[#b9c9b9]`} type="button" onClick={onClick}>
+      <Plus className="h-4 w-4" aria-hidden="true" />
       {children}
     </button>
   );
@@ -1002,8 +1016,8 @@ function AddButton({ children, onClick }) {
 
 function IconButton({ onClick }) {
   return (
-    <button className="tour-icon-danger" type="button" onClick={onClick}>
-      <Trash2 aria-hidden="true" />
+    <button className="grid h-9 w-9 place-items-center rounded-md border border-[#e5d6d3] bg-white text-[#b03622] transition hover:border-red-300 hover:bg-red-50" type="button" onClick={onClick}>
+      <Trash2 className="h-4 w-4" aria-hidden="true" />
     </button>
   );
 }

@@ -33,7 +33,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import logoImage from "../../assets/imigani tours.png";
 import { getCurrentUser, logout } from "../../services/authService";
 import {
@@ -102,6 +102,51 @@ const statusClass = {
   responded: "replied",
 };
 
+const dashboardPageClass =
+  'min-h-screen bg-[radial-gradient(circle_at_35%_0%,rgba(198,146,61,0.08),transparent_30rem),linear-gradient(135deg,#f8f6ef_0%,#eef3ea_100%)] font-sans text-[#1f2c22]'
+const panelClass = 'min-w-0 rounded-[8px] border border-[#e1e7dc] bg-white/95 p-[15px_19px] shadow-[0_14px_30px_rgba(18,53,27,0.07)]'
+const sectionHeadingClass = 'mb-4 flex flex-col items-start justify-between gap-[18px] sm:flex-row sm:items-end'
+const primaryLinkClass =
+  'inline-flex min-h-[42px] items-center justify-center gap-[9px] whitespace-nowrap rounded-md bg-[#0b2a12] px-4 text-[13px] font-black text-white shadow-[0_14px_28px_rgba(11,42,18,0.16)] transition hover:-translate-y-px hover:bg-[#14401d] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0'
+const secondaryLinkClass =
+  'inline-flex min-h-[42px] items-center justify-center gap-[9px] whitespace-nowrap rounded-md border border-[#dfe5da] bg-white px-4 text-[13px] font-black text-[#233126] transition hover:border-[#c6923d]/55 hover:text-[#c6923d] disabled:cursor-not-allowed disabled:opacity-70'
+const dangerLinkClass =
+  'inline-flex min-h-[34px] items-center justify-center whitespace-nowrap rounded-md border border-red-200 bg-white px-3 text-[12px] font-extrabold text-red-600 transition hover:border-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-70'
+const inlineErrorClass = 'rounded-md bg-[#fff1ed] px-[14px] py-3 text-[13px] font-black text-[#9b2f20]'
+const tableWrapClass = 'overflow-x-auto'
+const tableClass =
+  'w-full min-w-[760px] border-collapse [&_td]:border-b [&_td]:border-[#edf1e9] [&_td]:px-[14px] [&_td]:py-3 [&_td]:text-[13px] [&_td]:font-extrabold [&_td]:text-[#263129] [&_td]:align-middle [&_th]:border-b [&_th]:border-[#e4eadf] [&_th]:px-[14px] [&_th]:pb-3 [&_th]:text-left [&_th]:text-[12px] [&_th]:font-black [&_th]:uppercase [&_th]:text-[#677268] [&_tr:last-child_td]:border-b-0'
+const tableActionClass = 'flex flex-wrap items-center gap-2'
+const formInputClass =
+  'w-full rounded-md border border-[#dce4d8] bg-white px-4 py-3 text-sm font-bold text-[#26332a] outline-none transition focus:border-[#d3a14e] focus:ring-4 focus:ring-[#d3a14e]/20'
+const formLabelClass = 'grid gap-2 text-sm font-bold text-[#0b2a12]'
+const requestStatusClass = 'min-h-[34px] rounded-md border border-[#dce4d8] bg-white py-0 pl-2.5 pr-[30px] text-[12px] font-semibold text-[#0b2a12]'
+const emptyStateClass = 'grid min-h-[230px] place-items-center content-center gap-2.5 rounded-[8px] border border-dashed border-[#d8e0d5] bg-[#fbfcfa] p-8 text-center'
+
+function statusBadgeClass(status) {
+  const tone = statusClass[status] || status || 'draft'
+  const base = 'inline-flex w-max rounded px-[7px] py-1 text-[11px] font-black capitalize leading-none'
+
+  if (tone === 'new' || tone === 'published' || tone === 'approved' || tone === 'confirmed' || tone === 'paid') {
+    return `${base} bg-[#e1f0dc] text-[#0a672c]`
+  }
+  if (tone === 'replied' || tone === 'draft' || tone === 'responded') {
+    return `${base} bg-[#dceafa] text-[#1d5f9e]`
+  }
+  if (tone === 'pending' || tone === 'in_progress' || tone === 'rejected') {
+    return `${base} bg-[#fbefd9] text-[#936417]`
+  }
+  if (tone === 'inactive' || tone === 'archived' || tone === 'closed') {
+    return `${base} bg-[#ecefeb] text-[#667166]`
+  }
+
+  return `${base} bg-[#ecefeb] text-[#667166]`
+}
+
+function sectionEyebrow(title) {
+  return <span className="mb-1.5 block text-[12px] font-black uppercase text-[#a36a13]">{title}</span>
+}
+
 function getInitials(name = "") {
   const parts = name.trim().split(/\s+/).filter(Boolean);
 
@@ -117,7 +162,6 @@ function getInitials(name = "") {
 }
 
 function Dashboard() {
-  const { pathname } = useLocation();
   const navigate = useNavigate();
   const [isSidebarProfileOpen, setIsSidebarProfileOpen] = useState(false);
   const [isHeaderProfileOpen, setIsHeaderProfileOpen] = useState(false);
@@ -178,47 +222,57 @@ function Dashboard() {
     setNotifications((current) => current.filter((item) => item.id !== id));
   }
 
-  const isOverview = pathname === "/dashboard";
   const unreadCount = notifications.filter((item) => Number(item.is_read) === 0).length;
 
   return (
-    <main className={`dashboard-page${isOverview ? " is-overview" : ""}`}>
-      <aside className={`dashboard-sidebar${isDashboardMenuOpen ? " is-open" : ""}`} aria-label="Dashboard navigation">
-        <div className="dashboard-mobile-bar">
+    <main className={dashboardPageClass}>
+      <aside
+        className={`fixed bottom-0 left-0 top-0 z-20 flex w-[280px] flex-col overflow-y-auto bg-[linear-gradient(180deg,#092512_0%,#12351b_64%,#0a2411_100%)] text-white shadow-[14px_0_35px_rgba(9,37,18,0.18)] max-[980px]:right-0 max-[980px]:bottom-auto max-[980px]:w-full max-[980px]:overflow-visible ${
+          isDashboardMenuOpen ? 'max-[980px]:max-h-[100svh]' : 'max-[980px]:max-h-[68px]'
+        }`}
+        aria-label="Dashboard navigation"
+      >
+        <div className="hidden min-h-[68px] items-center justify-between gap-3 border-b border-white/10 bg-[#082511] px-5 max-[980px]:flex">
           <div>
-            <strong>IMIGANI</strong>
-            <span>Tours &amp; Safaris</span>
+            <strong className="block text-[20px] font-bold leading-none tracking-wide">IMIGANI</strong>
+            <span className="mt-1 block text-[12px] font-bold text-white/70">Tours &amp; Safaris</span>
           </div>
           <button
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/14 bg-white/10 text-white"
             type="button"
             aria-controls="dashboard-navigation"
             aria-expanded={isDashboardMenuOpen}
             aria-label={isDashboardMenuOpen ? "Close dashboard menu" : "Open dashboard menu"}
             onClick={() => setIsDashboardMenuOpen((current) => !current)}
           >
-            {isDashboardMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+            {isDashboardMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>
         </div>
-        <div className="dashboard-brand flex-col">
-          <h1 className="dashboard-brand-title font-bold text-4xl">IMIGANI</h1>
-          <span className="dashboard-brand-subtitle ">Tours & Safaris</span>
+        <div className="flex min-h-[86px] flex-col items-center justify-center px-6 pb-3 pt-[17px] max-[980px]:hidden">
+          <h1 className="text-4xl font-bold leading-none text-white">IMIGANI</h1>
+          <span className="mt-2 text-[17px] font-semibold text-white/82">Tours & Safaris</span>
         </div>
 
-        <nav id="dashboard-navigation" className="dashboard-nav">
+        <nav id="dashboard-navigation" className="grid gap-1.5 px-[18px] pb-4 max-[980px]:overflow-y-auto max-[980px]:px-5 max-[980px]:py-4">
           {navItems.map(({ label, href, icon: Icon, end }) => (
             <NavLink
               className={({ isActive }) =>
-                `dashboard-nav-link${isActive ? " is-active" : ""}`
+                `relative flex min-h-[47px] items-center gap-5 rounded-[8px] px-[18px] text-[14px] font-bold transition hover:translate-x-0.5 hover:bg-white/10 hover:text-white ${
+                  isActive ? "bg-[#c6923d]/20 text-[#d3a14e] before:absolute before:bottom-0 before:left-0 before:top-0 before:w-1.5 before:rounded-l-[8px] before:bg-[#d3a14e]" : "text-white/75"
+                }`
               }
               end={end}
               to={href}
               key={label}
               onClick={() => setIsDashboardMenuOpen(false)}
             >
-              <Icon aria-hidden="true" />
-              <span>{label}</span>
+              <Icon className="h-[22px] w-[22px] flex-none stroke-2" aria-hidden="true" />
+              <span className="min-w-0 flex-1">{label}</span>
               {label === "Requests" && newRequestCount > 0 && (
-                <strong className="dashboard-nav-badge" aria-label={`${newRequestCount} new requests`}>
+                <strong
+                  className="grid h-[22px] min-w-[22px] flex-none place-items-center rounded-full bg-[#d92d20] px-1.5 text-[11px] font-extrabold leading-none text-white shadow-[0_0_0_2px_rgba(255,255,255,0.12)]"
+                  aria-label={`${newRequestCount} new requests`}
+                >
                   {newRequestCount > 99 ? "99+" : newRequestCount}
                 </strong>
               )}
@@ -226,20 +280,20 @@ function Dashboard() {
           ))}
         </nav>
 
-        <div className="dashboard-sidebar-footer">
-          <section className="dashboard-help-box" aria-label="Visit public website">
-            <Globe2 aria-hidden="true" />
-            <strong>Visit Website</strong>
-            <p>Open the public IMIGANI Tours &amp; Safaris website.</p>
-            <a href="/" target="_blank" rel="noreferrer">
+        <div className="mt-auto grid gap-[9px] px-[14px] py-2.5 max-[980px]:px-5 max-[980px]:pb-5">
+          <section className="rounded-[8px] border border-white/10 bg-white/10 px-[14px] py-[11px]" aria-label="Visit public website">
+            <Globe2 className="mb-[7px] h-[18px] w-[18px] text-[#d3a14e]" aria-hidden="true" />
+            <strong className="block text-[13px] font-bold text-white">Visit Website</strong>
+            <p className="mt-1 text-[11px] leading-normal text-white/65">Open the public IMIGANI Tours &amp; Safaris website.</p>
+            <a className="mt-2 inline-flex items-center gap-[7px] text-[11px] font-black text-[#d3a14e]" href="/" target="_blank" rel="noreferrer">
               Go to Website
-              <ExternalLink aria-hidden="true" />
+              <ExternalLink className="h-[13px] w-[13px]" aria-hidden="true" />
             </a>
           </section>
 
-          <section className="dashboard-profile-menu" aria-label="Signed in user">
+          <section className="relative" aria-label="Signed in user">
             <button
-              className="dashboard-user-card"
+              className="flex w-full items-center gap-[11px] rounded-[8px] border border-white/10 bg-white/10 px-3 py-2.5 text-left text-white transition hover:border-[#d3a14e]/40 hover:bg-white/15"
               type="button"
               aria-expanded={isSidebarProfileOpen}
               onClick={() => {
@@ -247,24 +301,24 @@ function Dashboard() {
                 setIsHeaderProfileOpen(false);
               }}
             >
-              <div className="dashboard-avatar" aria-hidden="true">
+              <div className="grid h-[38px] w-[38px] flex-none place-items-center rounded-full bg-[#c6923d] text-[12px] font-extrabold text-white" aria-hidden="true">
                 {userInitials}
               </div>
-              <div>
-                <strong>{userName}</strong>
-                <span>{userRole}</span>
+              <div className="min-w-0 flex-1">
+                <strong className="block truncate text-[13px] font-bold text-white">{userName}</strong>
+                <span className="mt-1 block truncate text-[11px] leading-normal text-white/65">{userRole}</span>
               </div>
-              <ChevronDown className="dashboard-user-chevron" aria-hidden="true" />
+              <ChevronDown className="h-[15px] w-[15px] flex-none text-white/60" aria-hidden="true" />
             </button>
 
             {isSidebarProfileOpen && (
-              <div className="dashboard-profile-dropdown">
-                <div>
-                  <strong>{userName}</strong>
-                  <span>{user?.email || "Signed in"}</span>
+              <div className="absolute bottom-[calc(100%+8px)] left-0 right-0 z-30 overflow-hidden rounded-[8px] border border-white/10 bg-white text-[#132419] shadow-[0_18px_38px_rgba(0,0,0,0.22)]">
+                <div className="border-b border-[#e5ebe1] px-[13px] py-3">
+                  <strong className="block text-[13px] font-black text-[#102616]">{userName}</strong>
+                  <span className="mt-1 block truncate text-[11px] font-bold text-[#687265]">{user?.email || "Signed in"}</span>
                 </div>
-                <button type="button" onClick={handleLogout}>
-                  <LogOut aria-hidden="true" />
+                <button className="flex min-h-[42px] w-full items-center gap-[9px] bg-white px-[13px] text-left text-[13px] font-black text-[#9b2f20] transition hover:bg-[#fff1ed] hover:text-[#7f2116]" type="button" onClick={handleLogout}>
+                  <LogOut className="h-[17px] w-[17px]" aria-hidden="true" />
                   Logout
                 </button>
               </div>
@@ -273,19 +327,19 @@ function Dashboard() {
         </div>
       </aside>
 
-      <section className="dashboard-main" aria-label="IMIGANI admin overview">
-        <header className="dashboard-header dashboard-header-compact">
-          <div className="dashboard-header-controls">
+      <section className="min-h-screen p-[16px_26px_14px] pl-[306px] max-[980px]:px-4 max-[980px]:pb-5 max-[980px]:pt-[84px]" aria-label="IMIGANI admin overview">
+        <header className="sticky top-0 z-[15] -mx-2.5 mb-[14px] flex min-h-[54px] items-start justify-end gap-4 border-b border-[#e1e7dc]/70 bg-[linear-gradient(135deg,rgba(248,246,239,0.94),rgba(238,243,234,0.94))] p-[7px_10px] backdrop-blur">
+          <div className="flex flex-wrap justify-end gap-2.5">
             <div className="relative">
               <button
-                className="dashboard-icon-button"
+                className="relative inline-flex min-h-9 w-9 items-center justify-center gap-2 rounded-[8px] border border-[#dfe5da] bg-white text-[13px] font-extrabold text-[#263129] shadow-[0_8px_20px_rgba(18,53,27,0.06)] transition hover:-translate-y-px hover:border-[#c6923d]/55 hover:shadow-[0_12px_24px_rgba(18,53,27,0.1)]"
                 type="button"
                 aria-expanded={isNotificationsOpen}
                 aria-label="Notifications"
                 onClick={() => setIsNotificationsOpen((current) => !current)}
               >
-                <Bell aria-hidden="true" />
-                {unreadCount > 0 && <span>{unreadCount}</span>}
+                <Bell className="h-4 w-4" aria-hidden="true" />
+                {unreadCount > 0 && <span className="absolute -right-1.5 -top-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full border-2 border-white bg-[#c6422d] px-1 text-[10px] leading-none text-white">{unreadCount}</span>}
               </button>
               {isNotificationsOpen && (
                 <NotificationsDropdown
@@ -295,9 +349,9 @@ function Dashboard() {
                 />
               )}
             </div>
-            <div className="dashboard-header-profile">
+            <div className="relative">
               <button
-                className="dashboard-account-button"
+                className="inline-flex min-h-9 items-center justify-center gap-2 rounded-[8px] border border-[#dfe5da] bg-white py-0 pl-[9px] pr-3 text-[13px] font-extrabold text-[#263129] shadow-[0_8px_20px_rgba(18,53,27,0.06)] transition hover:-translate-y-px hover:border-[#c6923d]/55 hover:shadow-[0_12px_24px_rgba(18,53,27,0.1)]"
                 type="button"
                 aria-expanded={isHeaderProfileOpen}
                 onClick={() => {
@@ -306,31 +360,35 @@ function Dashboard() {
                   setIsNotificationsOpen(false);
                 }}
               >
-                <span className="dashboard-account-logo">
-                  <img src={logoImage} alt="" />
+                <span className="grid h-7 w-7 flex-none place-items-center overflow-hidden rounded-full border border-[#e7ede3] bg-[#f8f6ef]">
+                  <img className="h-6 w-6 object-contain" src={logoImage} alt="" />
                 </span>
                 <span>{userName}</span>
-                <ChevronDown aria-hidden="true" />
+                <ChevronDown className="h-4 w-4" aria-hidden="true" />
               </button>
 
               {isHeaderProfileOpen && (
-                <div className="dashboard-header-profile-dropdown">
-                  <div>
-                    <strong>{userName}</strong>
-                    <span>{user?.email || "Signed in"}</span>
+                <div className="absolute right-0 top-[calc(100%+10px)] z-[45] w-[min(280px,calc(100vw-28px))] overflow-hidden rounded-[8px] border border-[#dfe5da] bg-white text-[#132419] shadow-[0_18px_38px_rgba(18,53,27,0.18)]">
+                  <div className="border-b border-[#e5ebe1] px-[13px] py-3">
+                    <strong className="block text-[13px] font-extrabold text-[#102616]">{userName}</strong>
+                    <span className="mt-1 block truncate text-[11px] font-semibold text-[#687265]">{user?.email || "Signed in"}</span>
                   </div>
-                  <button type="button" onClick={handleLogout}>
-                    <LogOut aria-hidden="true" />
+                  <button className="flex min-h-[42px] w-full items-center gap-[9px] bg-white px-[13px] text-left text-[13px] font-extrabold text-[#9b2f20] transition hover:bg-[#fff1ed] hover:text-[#7f2116]" type="button" onClick={handleLogout}>
+                    <LogOut className="h-[17px] w-[17px]" aria-hidden="true" />
                     Logout
                   </button>
                 </div>
               )}
             </div>
-            <LanguageMenu className="dashboard-language-menu" />
-            <button className="dashboard-select-button" type="button">
-              <CalendarDays aria-hidden="true" />
+            <LanguageMenu
+              className="z-40"
+              buttonClassName="!min-h-9 !rounded-[8px] !border-[#dfe5da] !bg-white !text-[13px] !font-extrabold !text-[#263129] !shadow-[0_8px_20px_rgba(18,53,27,0.06)] hover:!border-[#c6923d]/55 hover:!bg-white hover:!shadow-[0_12px_24px_rgba(18,53,27,0.1)]"
+              listClassName="!z-40"
+            />
+            <button className="inline-flex min-h-9 items-center justify-center gap-2 rounded-[8px] border border-[#dfe5da] bg-white px-[14px] text-[13px] font-extrabold text-[#263129] shadow-[0_8px_20px_rgba(18,53,27,0.06)] transition hover:-translate-y-px hover:border-[#c6923d]/55 hover:shadow-[0_12px_24px_rgba(18,53,27,0.1)]" type="button">
+              <CalendarDays className="h-4 w-4" aria-hidden="true" />
               May 12 - May 18, 2024
-              <ChevronDown aria-hidden="true" />
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </header>
@@ -356,11 +414,11 @@ function Dashboard() {
 
 function DashboardPlaceholder() {
   return (
-    <article className="dashboard-panel dashboard-empty-state">
-      <Settings aria-hidden="true" />
-      <strong>This dashboard section is coming next</strong>
-      <span>Use Tour packages for now while the other management pages are being built.</span>
-      <Link to="/dashboard/tour-packages">Open Tour Packages</Link>
+    <article className={`${panelClass} ${emptyStateClass}`}>
+      <Settings className="h-[42px] w-[42px] text-[#0b2a12]" aria-hidden="true" />
+      <strong className="text-lg font-black text-[#0b2a12]">This dashboard section is coming next</strong>
+      <span className="max-w-[420px] text-sm font-bold text-[#687265]">Use Tour packages for now while the other management pages are being built.</span>
+      <Link className={primaryLinkClass} to="/dashboard/tour-packages">Open Tour Packages</Link>
     </article>
   );
 }
@@ -447,26 +505,26 @@ function DashboardOverview() {
 
   return (
     <>
-        {error && <p className="dashboard-inline-error">{error}</p>}
+        {error && <p className={inlineErrorClass}>{error}</p>}
         {isLoading && <p className="mb-4 text-sm font-bold text-[#617064]">Loading dashboard data...</p>}
-        <section className="dashboard-content-metrics" aria-label="Content metrics">
+        <section className="mb-[14px] grid grid-cols-4 gap-[14px] max-[1500px]:grid-cols-4 max-[1200px]:grid-cols-2 max-[640px]:grid-cols-1" aria-label="Content metrics">
           {metrics.map(({ label, value, note, icon: Icon, meta, gold }) => (
-            <article className="dashboard-content-stat-card" key={label}>
-              <div className={`dashboard-content-stat-icon${gold ? " is-gold" : ""}`}>
-                <Icon aria-hidden="true" />
+            <article className="grid min-h-[118px] grid-cols-[48px_minmax(0,1fr)] content-center gap-x-[14px] gap-y-0.5 rounded-[8px] border border-[#e1e7dc] bg-white/95 px-[18px] py-4 shadow-[0_14px_30px_rgba(18,53,27,0.07)] max-[520px]:grid-cols-[42px_minmax(0,1fr)] max-[520px]:px-4" key={label}>
+              <div className={`row-span-2 grid h-12 w-12 place-items-center rounded-full ${gold ? "bg-[#faedd6] text-[#bf790b]" : "bg-[#e6eee3] text-[#0f4923]"} max-[520px]:h-[42px] max-[520px]:w-[42px]`}>
+                <Icon className="h-[22px] w-[22px] stroke-[1.9]" aria-hidden="true" />
               </div>
-              <div className="dashboard-content-stat-copy">
-                <p>{label}</p>
-                <strong>{value}</strong>
-                <span>{note}</span>
+              <div>
+                <p className="mb-1.5 text-[14px] font-semibold text-[#111812]">{label}</p>
+                <strong className="block text-[28px] font-semibold leading-none text-[#070907]">{value}</strong>
+                <span className="mt-[7px] block text-[13px] font-medium text-[#6d746f]">{note}</span>
               </div>
-              <div className="dashboard-content-stat-meta">
+              <div className="col-span-full mt-2.5 flex flex-wrap gap-2 text-[12px] font-medium text-[#202b23]">
                 {meta.map((item, index) => (
                   <span
-                    className={item.tone ? `is-${item.tone}` : undefined}
+                    className={`inline-flex items-center gap-[13px] ${item.tone === "green" ? "text-[#23763a]" : item.tone === "gold" ? "text-[#c47b10]" : ""}`}
                     key={`${label}-${item.label}`}
                   >
-                    {index > 0 && <i aria-hidden="true" />}
+                    {index > 0 && <i className="h-1 w-1 rounded-full bg-[#a6aea5]" aria-hidden="true" />}
                     {item.label}: <strong>{item.value}</strong>
                   </span>
                 ))}
@@ -475,32 +533,34 @@ function DashboardOverview() {
           ))}
         </section>
 
-        <section className="dashboard-content-grid dashboard-content-lists">
-          <article className="dashboard-panel">
-            <div className="dashboard-panel-header">
+        <section className="grid grid-cols-2 gap-4 max-[1100px]:grid-cols-1">
+          <article className={panelClass}>
+            <div className="mb-[14px] flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2>Latest Enquiries</h2>
+                <h2 className="m-0 text-[17px] font-semibold text-[#102616]">Latest Enquiries</h2>
               </div>
-              <Link to="/dashboard/bookings">View All</Link>
+              <Link className="text-[12px] font-bold text-[#a36a13]" to="/dashboard/bookings">View All</Link>
             </div>
-            <div className="dashboard-enquiry-list">
+            <div>
               {latestInquiries.map((enquiry) => (
                 <article
-                  className={`dashboard-enquiry-row${Number(enquiry.is_read) === 0 ? " is-unread" : ""}`}
+                  className="grid grid-cols-[36px_minmax(0,0.78fr)_minmax(0,1.35fr)_auto] items-center gap-3 border-t border-[#edf1e9] py-2.5 first:border-t-0 max-[640px]:grid-cols-[32px_minmax(0,1fr)]"
                   key={enquiry.id}
                 >
-                  <span className="dashboard-row-icon">
-                    <Mail aria-hidden="true" />
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-[#e8f1e3] text-[#315a3c] max-[640px]:h-8 max-[640px]:w-8">
+                    <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
                   </span>
-                  <div>
-                    <strong>{enquiry.name}</strong>
-                    <span>{enquiry.inquiry}</span>
+                  <div className="min-w-0">
+                    <strong className={`block truncate text-[13px] ${Number(enquiry.is_read) === 0 ? "font-black text-[#102616]" : "font-semibold text-[#263129]"}`}>{enquiry.name}</strong>
+                    <span className={`block truncate text-[12px] ${Number(enquiry.is_read) === 0 ? "font-bold text-[#3f4c42]" : "font-medium text-[#6b756c]"}`}>{enquiry.inquiry}</span>
                   </div>
-                  <div className="dashboard-row-meta">
-                    <time>{formatDate(enquiry.created_at)}</time>
-                    <span
-                      className={`dashboard-status ${statusClass[enquiry.status] || "draft"}`}
-                    >
+                  <div className="min-w-0 max-[640px]:col-span-2 max-[640px]:pl-11">
+                    <span className={`block truncate text-[13px] ${Number(enquiry.is_read) === 0 ? "font-black text-[#102616]" : "font-semibold text-[#263129]"}`}>{getRequestSubject(enquiry, "Request")}</span>
+                    <span className="block truncate text-[12px] font-medium text-[#6b756c]">{getRequestPreview(enquiry.inquiry, getRequestSubject(enquiry, "Request"))}</span>
+                  </div>
+                  <div className="flex items-center justify-end gap-2 max-[640px]:col-span-2 max-[640px]:justify-between max-[640px]:pl-11">
+                    <time className="whitespace-nowrap text-[12px] font-semibold text-[#8a5b15]">{formatDate(enquiry.created_at)}</time>
+                    <span className={statusBadgeClass(enquiry.status)}>
                       {formatStatus(enquiry.status)}
                     </span>
                   </div>
@@ -510,23 +570,23 @@ function DashboardOverview() {
             </div>
           </article>
 
-          <article className="dashboard-panel">
-            <div className="dashboard-panel-header">
+          <article className={panelClass}>
+            <div className="mb-[14px] flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2>Recent Blog Posts</h2>
+                <h2 className="m-0 text-[17px] font-semibold text-[#102616]">Recent Blog Posts</h2>
               </div>
-              <Link to="/dashboard/blogs">View All</Link>
+              <Link className="text-[12px] font-bold text-[#a36a13]" to="/dashboard/blogs">View All</Link>
             </div>
-            <div className="dashboard-blog-list">
+            <div>
               {recentBlogPosts.map((post) => (
-                <article className="dashboard-blog-row" key={post.id}>
-                  {post.cover_image_url ? <img src={mediaPreviewUrl(post.cover_image_url)} alt="" /> : <FileText aria-hidden="true" />}
-                  <div>
-                    <strong>{post.title}</strong>
+                <article className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 border-t border-[#edf1e9] py-2.5 first:border-t-0 max-[640px]:grid-cols-[56px_minmax(0,1fr)]" key={post.id}>
+                  {post.cover_image_url ? <img className="h-12 w-16 rounded-md object-cover" src={mediaPreviewUrl(post.cover_image_url)} alt="" /> : <FileText className="h-10 w-10 rounded-md bg-[#e8f1e3] p-2 text-[#315a3c]" aria-hidden="true" />}
+                  <div className="min-w-0">
+                    <strong className="block truncate text-[13px] font-semibold text-[#102616]">{post.title}</strong>
                   </div>
-                  <div className="dashboard-row-meta">
-                    <time>{formatDate(post.created_at)}</time>
-                    <span className={`dashboard-status ${statusClass[post.status] || "draft"}`}>
+                  <div className="flex items-center justify-end gap-2 max-[640px]:col-span-2">
+                    <time className="whitespace-nowrap text-[12px] font-semibold text-[#6b756c]">{formatDate(post.created_at)}</time>
+                    <span className={statusBadgeClass(post.status)}>
                       {formatStatus(post.status)}
                     </span>
                   </div>
@@ -537,21 +597,21 @@ function DashboardOverview() {
           </article>
         </section>
 
-        <section className="dashboard-content-actions">
-          <article className="dashboard-panel">
-            <div className="dashboard-panel-header">
+        <section className="mt-4">
+          <article className={panelClass}>
+            <div className="mb-[14px] flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2>Quick Actions</h2>
+                <h2 className="m-0 text-[17px] font-semibold text-[#102616]">Quick Actions</h2>
               </div>
             </div>
-            <div className="dashboard-action-grid">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3">
               {quickActions.map(({ href, label, icon: Icon }) => (
                 <Link
-                  className="dashboard-action-tile"
+                  className="flex min-h-[76px] items-center gap-3 rounded-[8px] border border-[#dfe5da] bg-[#fbfcfa] px-[14px] py-3 text-[13px] font-black text-[#102616] transition hover:-translate-y-px hover:border-[#c6923d]/55 hover:bg-white hover:shadow-[0_12px_24px_rgba(18,53,27,0.1)]"
                   to={href}
                   key={label}
                 >
-                  <Icon aria-hidden="true" />
+                  <Icon className="h-5 w-5 text-[#c6923d]" aria-hidden="true" />
                   <span>{label}</span>
                 </Link>
               ))}
@@ -620,49 +680,49 @@ function TourPackagesPage() {
   }
 
   return (
-    <section className="dashboard-packages-page" aria-label="Tour packages">
-      <div className="dashboard-section-heading">
+    <section className="grid gap-4" aria-label="Tour packages">
+      <div className={sectionHeadingClass}>
         <div>
-          <span>Tour packages</span>
-          <h2>Manage Tour Packages</h2>
-          <p>View the tour packages stored in the database and create new safari experiences.</p>
+          {sectionEyebrow("Tour packages")}
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">Manage Tour Packages</h2>
+          <p className="mt-2 text-sm font-medium text-[#687265]">View the tour packages stored in the database and create new safari experiences.</p>
         </div>
-        <Link className="dashboard-primary-link" to="/dashboard/tour-packages/new">
-          <Plus aria-hidden="true" />
+        <Link className={primaryLinkClass} to="/dashboard/tour-packages/new">
+          <Plus className="h-4 w-4" aria-hidden="true" />
           Create New Tour Package
         </Link>
       </div>
 
-      <article className="dashboard-panel dashboard-table-panel">
-        <div className="dashboard-panel-header">
+      <article className={`${panelClass} grid gap-3 p-[17px_20px]`}>
+        <div className="mb-1 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2>All Tour Packages</h2>
-            <p>{isLoading ? "Loading packages..." : `${packages.length} packages found`}</p>
+            <h2 className="m-0 text-[17px] font-semibold text-[#102616]">All Tour Packages</h2>
+            <p className="mt-1 text-sm font-medium text-[#687265]">{isLoading ? "Loading packages..." : `${packages.length} packages found`}</p>
           </div>
         </div>
 
-        {error && <p className="dashboard-inline-error">{error}</p>}
+        {error && <p className={inlineErrorClass}>{error}</p>}
 
         {!error && isLoading && (
-          <div className="dashboard-empty-state">
-            <Package aria-hidden="true" />
-            <strong>Loading tour packages</strong>
-            <span>Please wait while we fetch the latest data.</span>
+          <div className={emptyStateClass}>
+            <Package className="h-[42px] w-[42px] text-[#0b2a12]" aria-hidden="true" />
+            <strong className="text-lg font-black text-[#0b2a12]">Loading tour packages</strong>
+            <span className="max-w-[420px] text-sm font-bold text-[#687265]">Please wait while we fetch the latest data.</span>
           </div>
         )}
 
         {!error && !isLoading && packages.length === 0 && (
-          <div className="dashboard-empty-state">
-            <Package aria-hidden="true" />
-            <strong>No tour packages yet</strong>
-            <span>Create your first package to start building the catalogue.</span>
-            <Link to="/dashboard/tour-packages/new">Create Package</Link>
+          <div className={emptyStateClass}>
+            <Package className="h-[42px] w-[42px] text-[#0b2a12]" aria-hidden="true" />
+            <strong className="text-lg font-black text-[#0b2a12]">No tour packages yet</strong>
+            <span className="max-w-[420px] text-sm font-bold text-[#687265]">Create your first package to start building the catalogue.</span>
+            <Link className={primaryLinkClass} to="/dashboard/tour-packages/new">Create Package</Link>
           </div>
         )}
 
         {!error && !isLoading && packages.length > 0 && (
-          <div className="dashboard-package-table-wrap">
-            <table className="dashboard-package-table">
+          <div className={tableWrapClass}>
+            <table className={tableClass}>
               <thead>
                 <tr>
                   <th>Package</th>
@@ -677,24 +737,24 @@ function TourPackagesPage() {
                 {packages.map((tour) => (
                   <tr key={tour.id}>
                     <td>
-                      <div className="dashboard-package-cell">
-                        <span>
+                      <div className="flex min-w-[250px] items-center gap-3">
+                        <span className="grid h-12 w-12 flex-none place-items-center overflow-hidden rounded-md bg-[#e9f0e7] text-[#0c3b1a]">
                           {tour.cover_image_url ? (
-                            <img src={mediaPreviewUrl(tour.cover_image_url)} alt="" />
+                            <img className="h-full w-full object-cover" src={mediaPreviewUrl(tour.cover_image_url)} alt="" />
                           ) : (
-                            <Package aria-hidden="true" />
+                            <Package className="h-5 w-5" aria-hidden="true" />
                           )}
                         </span>
-                        <div>
-                          <strong>{tour.name}</strong>
-                          <small>{plainTextSummary(tour.description, 72) || tour.slug}</small>
+                        <div className="min-w-0">
+                          <strong className="block truncate text-[13px] font-semibold text-[#102616]">{tour.name}</strong>
+                          <small className="mt-0.5 block truncate text-[12px] font-medium text-[#6a756d]">{plainTextSummary(tour.description, 72) || tour.slug}</small>
                         </div>
                       </div>
                     </td>
                     <td>{tour.category_name || "Uncategorized"}</td>
                     <td>{formatDuration(tour)}</td>
                     <td>
-                      <span className={`dashboard-status ${tour.status || "draft"}`}>
+                      <span className={statusBadgeClass(tour.status || "draft")}>
                         {tour.status || "draft"}
                       </span>
                     </td>
@@ -823,15 +883,15 @@ function TourCategoriesPage() {
   }
 
   return (
-    <section className="dashboard-packages-page" aria-label="Tour categories">
-      <div className="dashboard-section-heading">
+    <section className="grid gap-4" aria-label="Tour categories">
+      <div className={sectionHeadingClass}>
         <div>
-          <span>Tour packages</span>
-          <h2>Tour Categories</h2>
-          <p>Manage the categories used when creating and organizing tour packages.</p>
+          {sectionEyebrow("Tour packages")}
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">Tour Categories</h2>
+          <p className="mt-2 text-sm font-medium text-[#687265]">Manage the categories used when creating and organizing tour packages.</p>
         </div>
         <button
-          className="dashboard-primary-link"
+          className={primaryLinkClass}
           type="button"
           onClick={() => {
             if (isCreating) {
@@ -842,31 +902,31 @@ function TourCategoriesPage() {
             handleCreateNew();
           }}
         >
-          <Plus aria-hidden="true" />
+          <Plus className="h-4 w-4" aria-hidden="true" />
           {isCreating ? "Back to Categories" : "Create Category"}
         </button>
       </div>
 
       {isCreating && (
-        <form className="dashboard-panel mb-6 grid gap-4" onSubmit={handleSaveCategory}>
+        <form className={`${panelClass} mb-2 grid gap-4`} onSubmit={handleSaveCategory}>
           <h3 className="text-xl font-bold text-[var(--deep-green)]">
             {editingCategoryId ? "Edit Tour Category" : "Create Tour Category"}
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-bold text-[var(--deep-green)]">
+            <label className={formLabelClass}>
               Category Name
               <input
-                className="rounded-md border border-[#dce4d8] px-4 py-3 text-sm font-bold"
+                className={formInputClass}
                 placeholder="Wildlife Tours"
                 value={form.name}
                 onChange={(event) => setFormValue(setForm, "name", event.target.value)}
                 required
               />
             </label>
-            <label className="grid gap-2 text-sm font-bold text-[var(--deep-green)]">
+            <label className={formLabelClass}>
               Status
               <select
-                className="rounded-md border border-[#dce4d8] px-4 py-3 text-sm font-bold"
+                className={formInputClass}
                 value={form.status}
                 onChange={(event) => setFormValue(setForm, "status", event.target.value)}
               >
@@ -875,21 +935,21 @@ function TourCategoriesPage() {
               </select>
             </label>
           </div>
-          <label className="grid gap-2 text-sm font-bold text-[var(--deep-green)]">
+          <label className={formLabelClass}>
             Description
             <textarea
-              className="min-h-[110px] rounded-md border border-[#dce4d8] px-4 py-3 text-sm font-bold"
+              className={`${formInputClass} min-h-[110px] resize-y`}
               placeholder="Short description for this tour package category"
               value={form.description}
               onChange={(event) => setFormValue(setForm, "description", event.target.value)}
             />
           </label>
           <div className="flex flex-wrap justify-end gap-3">
-            <button className="dashboard-secondary-link" type="button" onClick={resetCategoryForm}>
+            <button className={secondaryLinkClass} type="button" onClick={resetCategoryForm}>
               Cancel
             </button>
-            <button className="dashboard-primary-link" type="submit" disabled={isSaving}>
-              <Plus aria-hidden="true" />
+            <button className={primaryLinkClass} type="submit" disabled={isSaving}>
+              <Plus className="h-4 w-4" aria-hidden="true" />
               {isSaving ? "Saving..." : editingCategoryId ? "Save Changes" : "Save Category"}
             </button>
           </div>
@@ -906,8 +966,8 @@ function TourCategoriesPage() {
         isLoading={isLoading}
         rows={categories}
       >
-        <div className="dashboard-package-table-wrap">
-          <table className="dashboard-package-table dashboard-category-table">
+        <div className={tableWrapClass}>
+          <table className={tableClass}>
             <thead>
               <tr>
                 <th>Category</th>
@@ -922,17 +982,17 @@ function TourCategoriesPage() {
               {categories.map((category) => (
                 <tr key={category.id}>
                   <td>
-                    <strong className="dashboard-category-name">{category.name}</strong>
+                    <strong className="block min-w-[190px] text-[13px] font-semibold text-[#102616]">{category.name}</strong>
                   </td>
-                  <td className="dashboard-muted-cell">/{category.slug}</td>
+                  <td className="text-[#6c766e]">/{category.slug}</td>
                   <td>
-                    <span className="dashboard-category-description">
+                    <span className="block max-w-[520px] whitespace-normal text-[13px] font-medium leading-6 text-[#4e5a51]">
                       {category.description || "No description added."}
                     </span>
                   </td>
                   <td>
                     <select
-                      className="dashboard-request-status"
+                      className={requestStatusClass}
                       value={category.status}
                       onChange={(event) => handleStatusChange(category.id, event.target.value)}
                     >
@@ -940,18 +1000,18 @@ function TourCategoriesPage() {
                       <option value="inactive">Inactive</option>
                     </select>
                   </td>
-                  <td className="dashboard-muted-cell">{formatDate(category.created_at)}</td>
+                  <td className="text-[#6c766e]">{formatDate(category.created_at)}</td>
                   <td>
-                    <div className="dashboard-table-actions">
+                    <div className={tableActionClass}>
                       <button
-                        className="dashboard-secondary-link"
+                        className={secondaryLinkClass}
                         type="button"
                         onClick={() => handleEditCategory(category)}
                       >
                         Edit
                       </button>
                       <button
-                        className="dashboard-danger-link"
+                        className={dangerLinkClass}
                         type="button"
                         onClick={() => handleDeleteCategory(category)}
                       >
@@ -1030,10 +1090,14 @@ function BookingsPage() {
       isLoading={isLoading}
       rows={requests}
     >
-      <div className="dashboard-request-tabs" role="tablist" aria-label="Request types">
+      <div className="mb-4 flex flex-wrap gap-2 border-b border-[#e4eadf] pb-[15px]" role="tablist" aria-label="Request types">
         {requestTabConfig.map((tab) => (
           <button
-            className={activeTab === tab.id ? "is-active" : ""}
+            className={`inline-flex min-h-[44px] items-center gap-3 rounded-[8px] border px-4 text-sm font-medium transition ${
+              activeTab === tab.id
+                ? "border-[#0b2a12] bg-[#0b2a12] text-white"
+                : "border-[#dfe5da] bg-white text-[#263129] hover:border-[#c6923d]/55"
+            }`}
             type="button"
             role="tab"
             aria-selected={activeTab === tab.id}
@@ -1041,38 +1105,45 @@ function BookingsPage() {
             onClick={() => setActiveTab(tab.id)}
           >
             <span>{tab.label}</span>
-            {(requestGroups[tab.id]?.count || 0) > 0 && <em>{requestGroups[tab.id].count}</em>}
+            {(requestGroups[tab.id]?.count || 0) > 0 && (
+              <em className={`grid h-6 min-w-6 place-items-center rounded-full px-2 text-xs not-italic ${
+                activeTab === tab.id ? "bg-white/20 text-white" : "bg-[#edf1ee] text-[#263129]"
+              }`}>
+                {requestGroups[tab.id].count}
+              </em>
+            )}
           </button>
         ))}
       </div>
 
       {activeRequests.length > 0 ? (
-        <div className="dashboard-request-list">
+        <div className="overflow-hidden rounded-[8px] border border-[#e1e7dc]">
           {activeRequests.map((request) => {
             const subject = getRequestSubject(request, requestGroups[activeTab].label);
             const preview = getRequestPreview(request.inquiry, subject);
+            const isUnread = Number(request.is_read) === 0;
 
             return (
               <article
-                className={`dashboard-request-card${Number(request.is_read) === 0 ? " is-unread" : ""}`}
+                className={`border-b border-[#e4eadf] bg-white px-4 py-3 last:border-b-0 ${isUnread ? "text-[#15251a]" : "text-[#566158]"}`}
                 key={request.id}
               >
-                <div className="dashboard-request-row">
-                  <span className="dashboard-request-dot" aria-hidden="true" />
-                  <div className="dashboard-request-sender">
-                    <strong>{request.name}</strong>
-                    <span>{request.email}</span>
+                <div className="grid grid-cols-[12px_minmax(180px,0.85fr)_minmax(260px,1.9fr)_auto] items-center gap-4 max-[900px]:grid-cols-[12px_minmax(0,1fr)_auto] max-[640px]:grid-cols-[12px_minmax(0,1fr)]">
+                  <span className={`h-2 w-2 rounded-full ${isUnread ? "bg-[#d92d20]" : "bg-[#d2dbd2]"}`} aria-hidden="true" />
+                  <div className="min-w-0">
+                    <strong className={`block truncate text-[13px] ${isUnread ? "font-black" : "font-semibold"}`}>{request.name}</strong>
+                    <span className={`block truncate text-[12px] ${isUnread ? "font-bold" : "font-medium"} text-[#6c766e]`}>{request.email}</span>
                   </div>
                   <Link
-                    className="dashboard-request-summary"
+                    className="min-w-0 hover:text-[#a36a13] max-[900px]:col-span-2 max-[900px]:col-start-2"
                     to={`/dashboard/bookings/${request.id}`}
                   >
-                    <strong>{subject}</strong>
-                    <span>{preview}</span>
+                    <strong className={`block truncate text-[13px] ${isUnread ? "font-black text-[#111812]" : "font-semibold text-[#263129]"}`}>{subject}</strong>
+                    <span className={`block truncate text-[12px] ${isUnread ? "font-bold text-[#3f4c42]" : "font-medium text-[#747d75]"}`}>{preview}</span>
                   </Link>
-                  <div className="dashboard-request-meta">
+                  <div className="flex items-center justify-end gap-3 max-[900px]:col-span-3 max-[900px]:justify-end max-[640px]:col-span-2 max-[640px]:flex-wrap">
                     <select
-                      className="dashboard-request-status"
+                      className={requestStatusClass}
                       value={request.status}
                       onChange={(event) => handleStatusChange(request.id, event.target.value)}
                     >
@@ -1081,8 +1152,8 @@ function BookingsPage() {
                       <option value="responded">Responded</option>
                       <option value="closed">Closed</option>
                     </select>
-                    <time>{formatDate(request.created_at)}</time>
-                    <Link className="dashboard-request-open-link" to={`/dashboard/bookings/${request.id}`}>
+                    <time className="whitespace-nowrap text-[12px] font-semibold uppercase text-[#a36a13]">{formatDate(request.created_at)}</time>
+                    <Link className="inline-flex min-h-[34px] items-center justify-center rounded-md border border-[#dfe5da] bg-white px-3 text-[12px] font-black text-[#233126] transition hover:border-[#c6923d]/55 hover:text-[#c6923d]" to={`/dashboard/bookings/${request.id}`}>
                       Open
                     </Link>
                   </div>
@@ -1119,6 +1190,8 @@ function SubscribersPage() {
   return (
     <DashboardListPage
       title="Subscribers"
+      eyebrow="Audience"
+      description="Emails collected from the newsletter subscription form."
       emptyIcon={Mail}
       emptyTitle="No subscribers yet"
       emptyText="When visitors subscribe from the website, their emails will appear here."
@@ -1126,17 +1199,17 @@ function SubscribersPage() {
       isLoading={isLoading}
       rows={subscribers}
     >
-      <div className="dashboard-subscriber-list">
+      <div className="overflow-hidden rounded-[8px] border border-[#e1e7dc]">
         {subscribers.map((subscriber) => (
-          <article className="dashboard-subscriber-row" key={subscriber.id}>
-            <div>
-              <strong>{subscriber.email}</strong>
-              <span>{subscriber.source || "website"}</span>
+          <article className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-[#edf1e9] bg-white px-4 py-3 last:border-b-0 max-[640px]:grid-cols-1" key={subscriber.id}>
+            <div className="min-w-0">
+              <strong className="block truncate text-[13px] font-semibold text-[#102616]">{subscriber.email}</strong>
+              <span className="mt-1 block text-[12px] font-medium text-[#6c766e]">{subscriber.source || "website"}</span>
             </div>
-            <div>
-              <time>{formatDate(subscriber.created_at)}</time>
+            <div className="flex items-center justify-end gap-3 max-[640px]:justify-start">
+              <time className="whitespace-nowrap text-[12px] font-semibold uppercase text-[#a36a13]">{formatDate(subscriber.created_at)}</time>
               <select
-                className="dashboard-request-status"
+                className={requestStatusClass}
                 value={subscriber.status}
                 onChange={(event) => handleStatusChange(subscriber.id, event.target.value)}
               >
@@ -1201,20 +1274,20 @@ function RequestDetailPage() {
   }
 
   return (
-    <section className="dashboard-packages-page" aria-label="Request details">
-      <div className="dashboard-section-heading">
+    <section className="grid gap-4" aria-label="Request details">
+      <div className={sectionHeadingClass}>
         <div>
-          <span>Requests</span>
-          <h2>Request Details</h2>
-          <p>Read the full message and update its response status.</p>
+          {sectionEyebrow("Requests")}
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">Request Details</h2>
+          <p className="mt-2 text-sm font-medium text-[#687265]">Read the full message and update its response status.</p>
         </div>
-        <Link className="dashboard-secondary-link" to="/dashboard/bookings">
+        <Link className={secondaryLinkClass} to="/dashboard/bookings">
           Back to Requests
         </Link>
       </div>
 
-      <article className="dashboard-panel">
-        {error && <p className="dashboard-inline-error">{error}</p>}
+      <article className={panelClass}>
+        {error && <p className={inlineErrorClass}>{error}</p>}
         {!error && isLoading && (
           <EmptyState icon={Mail} title="Loading request" text="Please wait while we fetch the request details." />
         )}
@@ -1222,18 +1295,18 @@ function RequestDetailPage() {
           <EmptyState icon={Mail} title="Request not found" text="This request could not be found in the database." />
         )}
         {!error && !isLoading && request && (
-          <div className="dashboard-request-detail">
-            <div className="dashboard-request-detail-header">
+          <div className="grid gap-5">
+            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#e4eadf] pb-5">
               <div>
-                <span className="dashboard-request-type">{typeLabel}</span>
-                <h3>{subject}</h3>
-                <p>{request.name}</p>
-                <a href={`mailto:${request.email}`}>{request.email}</a>
-                {request.phone && <a href={`tel:${request.phone}`}>{request.phone}</a>}
+                <span className="mb-2 inline-flex rounded-full bg-[#edf3eb] px-3 py-1 text-[11px] font-black uppercase text-[#a36a13]">{typeLabel}</span>
+                <h3 className="m-0 text-[22px] font-semibold leading-tight text-[#102616]">{subject}</h3>
+                <p className="mt-2 text-sm font-semibold text-[#4c574f]">{request.name}</p>
+                <a className="mt-1 block text-sm font-semibold text-[#4c574f] hover:text-[#a36a13]" href={`mailto:${request.email}`}>{request.email}</a>
+                {request.phone && <a className="mt-1 block text-sm font-semibold text-[#4c574f] hover:text-[#a36a13]" href={`tel:${request.phone}`}>{request.phone}</a>}
               </div>
-              <div>
+              <div className="flex flex-col items-end gap-2 max-[640px]:items-start">
                 <select
-                  className="dashboard-request-status"
+                  className={requestStatusClass}
                   value={request.status}
                   onChange={(event) => handleStatusChange(event.target.value)}
                 >
@@ -1242,10 +1315,10 @@ function RequestDetailPage() {
                   <option value="responded">Responded</option>
                   <option value="closed">Closed</option>
                 </select>
-                <time>{formatDate(request.created_at)}</time>
+                <time className="text-[12px] font-semibold uppercase text-[#a36a13]">{formatDate(request.created_at)}</time>
               </div>
             </div>
-            <div className="dashboard-request-detail-message">{request.inquiry}</div>
+            <div className="min-h-[240px] whitespace-pre-wrap rounded-[8px] border border-[#e4eadf] bg-[#fbfcfa] px-5 py-4 text-[15px] font-medium leading-8 text-[#2f3a33]">{request.inquiry}</div>
           </div>
         )}
       </article>
@@ -1347,7 +1420,7 @@ function ReviewsPage() {
             </div>
             <div className="flex gap-2">
               <select
-                className="rounded-md border border-[#dce4d8] bg-white px-3 py-2 text-sm font-bold text-[var(--deep-green)]"
+                className={requestStatusClass}
                 value={review.status}
                 onChange={(event) => handleStatusChange(review.id, event.target.value)}
               >
@@ -1355,7 +1428,7 @@ function ReviewsPage() {
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
               </select>
-              <button className="rounded-md border border-red-200 px-3 py-2 text-sm font-bold text-red-700" type="button" onClick={() => handleDelete(review.id)}>
+              <button className={dangerLinkClass} type="button" onClick={() => handleDelete(review.id)}>
                 Delete
               </button>
             </div>
@@ -1477,13 +1550,13 @@ function BlogsPage() {
   }
 
   return (
-    <section className="dashboard-packages-page" aria-label="Blog posts">
-      <div className="dashboard-section-heading">
+    <section className="grid gap-4" aria-label="Blog posts">
+      <div className={sectionHeadingClass}>
         <div>
-          <h2>Blog Posts</h2>
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">Blog Posts</h2>
         </div>
         <button
-          className="dashboard-primary-link"
+          className={primaryLinkClass}
           type="button"
           onClick={() => {
             if (isCreating) {
@@ -1494,20 +1567,20 @@ function BlogsPage() {
             handleCreateNew();
           }}
         >
-          <Plus aria-hidden="true" />
+          <Plus className="h-4 w-4" aria-hidden="true" />
           {isCreating ? "Back to Posts" : "Create New Post"}
         </button>
       </div>
 
       {isCreating && (
-        <form className="dashboard-panel mb-6 grid gap-4" onSubmit={(event) => handleSavePost(event, "draft")}>
+        <form className={`${panelClass} mb-2 grid gap-4`} onSubmit={(event) => handleSavePost(event, "draft")}>
           <h3 className="text-xl font-bold text-[var(--deep-green)]">
             {editingPostId ? "Edit Blog Post" : "Create Blog Post"}
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-bold text-[var(--deep-green)]">
+            <label className={formLabelClass}>
               Title
-              <input className="rounded-md border border-[#dce4d8] px-4 py-3 text-sm font-bold" placeholder="Blog title" value={form.title} onChange={(event) => setFormValue(setForm, "title", event.target.value)} required />
+              <input className={formInputClass} placeholder="Blog title" value={form.title} onChange={(event) => setFormValue(setForm, "title", event.target.value)} required />
             </label>
             <div className="grid gap-2 text-sm font-bold text-[var(--deep-green)]">
               <span>Cover Image</span>
@@ -1558,31 +1631,31 @@ function BlogsPage() {
           </div>
           <div className="flex flex-wrap justify-end gap-3">
               <button
-                className="dashboard-secondary-link"
+                className={secondaryLinkClass}
                 type="button"
                 onClick={resetBlogForm}
               >
                 Cancel
               </button>
-              <button className="dashboard-secondary-link" type="submit" disabled={isSaving || isUploadingImage}>
-                <Plus aria-hidden="true" />
+              <button className={secondaryLinkClass} type="submit" disabled={isSaving || isUploadingImage}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
                 {isSaving ? "Saving..." : "Save Draft"}
               </button>
               <button
-                className="dashboard-primary-link"
+                className={primaryLinkClass}
                 type="button"
                 disabled={isSaving || isUploadingImage}
                 onClick={(event) => handleSavePost(event, "published")}
               >
-                <Plus aria-hidden="true" />
+                <Plus className="h-4 w-4" aria-hidden="true" />
                 {isSaving ? "Publishing..." : "Publish"}
               </button>
           </div>
         </form>
       )}
 
-      <article className="dashboard-panel grid gap-3">
-        {error && <p className="dashboard-inline-error">{error}</p>}
+      <article className={`${panelClass} grid gap-3`}>
+        {error && <p className={inlineErrorClass}>{error}</p>}
         {!error && isLoading && <EmptyState icon={FileText} title="Loading blog posts" text="Please wait while we fetch the latest posts." />}
         {!error && !isLoading && posts.length === 0 && (
           <EmptyState icon={FileText} title="No blog posts yet" text="Use the Create New Post button above to add the first blog story." />
@@ -1599,11 +1672,11 @@ function BlogsPage() {
                   <p className="mt-2 text-sm font-bold text-[#617064]">{plainTextSummary(post.content, 150) || "No content added."}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button className="dashboard-secondary-link" type="button" onClick={() => handleEditPost(post)}>
+                  <button className={secondaryLinkClass} type="button" onClick={() => handleEditPost(post)}>
                     Edit Full Post
                   </button>
                   <select
-                    className="rounded-md border border-[#dce4d8] bg-white px-3 py-2 text-sm font-bold text-[var(--deep-green)]"
+                    className={requestStatusClass}
                     value={post.status}
                     onChange={(event) => handleStatusChange(post.id, event.target.value)}
                   >
@@ -1611,7 +1684,7 @@ function BlogsPage() {
                     <option value="published">Published</option>
                     <option value="archived">Archived</option>
                   </select>
-                  <button className="rounded-md border border-red-200 px-3 py-2 text-sm font-bold text-red-700" type="button" onClick={() => handleDelete(post.id)}>
+                  <button className={dangerLinkClass} type="button" onClick={() => handleDelete(post.id)}>
                     Delete
                   </button>
                 </div>
@@ -1692,7 +1765,7 @@ function RichTextEditor({ value, onChange, placeholder, minHeightClass = "min-h-
           ref={editorRef}
           aria-label={placeholder}
           aria-multiline="true"
-          className={`dashboard-rich-editor-content ${minHeightClass} px-3 py-3 text-[13px] leading-7 text-[#142319] outline-none [&_a]:text-[#a36a13] [&_a]:underline [&_h1]:mb-3 [&_h1]:mt-1 [&_h1]:text-2xl [&_h2]:mb-2 [&_h2]:mt-1 [&_h2]:text-xl [&_li]:ml-5 [&_ol]:list-decimal [&_ul]:list-disc`}
+          className={`${minHeightClass} px-3 py-3 text-[13px] font-medium leading-7 text-[#142319] outline-none [&_a]:text-[#a36a13] [&_a]:underline [&_b]:font-semibold [&_h1]:mb-3 [&_h1]:mt-1 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:mt-1 [&_h2]:text-xl [&_h2]:font-semibold [&_li]:ml-5 [&_ol]:list-decimal [&_strong]:font-semibold [&_ul]:list-disc`}
           contentEditable
           role="textbox"
           suppressContentEditableWarning
@@ -1782,29 +1855,29 @@ function SettingsPage() {
   ];
 
   return (
-    <section className="dashboard-packages-page" aria-label="Settings">
-      <div className="dashboard-section-heading">
+    <section className="grid gap-4" aria-label="Settings">
+      <div className={sectionHeadingClass}>
         <div>
-          <span>Settings</span>
-          <h2>Website Settings</h2>
-          <p>Manage core business details used across the website and notifications.</p>
+          {sectionEyebrow("Settings")}
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">Website Settings</h2>
+          <p className="mt-2 text-sm font-medium text-[#687265]">Manage core business details used across the website and notifications.</p>
         </div>
       </div>
-      <form className="dashboard-panel grid gap-4" onSubmit={handleSubmit}>
-        {error && <p className="dashboard-inline-error">{error}</p>}
+      <form className={`${panelClass} grid gap-4`} onSubmit={handleSubmit}>
+        {error && <p className={inlineErrorClass}>{error}</p>}
         {isLoading ? (
           <p className="text-sm font-bold text-[#617064]">Loading settings...</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {fields.map(([key, label]) => (
-              <label className="grid gap-2 text-sm font-bold text-[var(--deep-green)]" key={key}>
+              <label className={formLabelClass} key={key}>
                 {label}
-                <input className="rounded-md border border-[#dce4d8] px-4 py-3 text-sm font-bold text-[#26332a]" value={settings[key] || ""} onChange={(event) => setFormValue(setSettings, key, event.target.value)} />
+                <input className={formInputClass} value={settings[key] || ""} onChange={(event) => setFormValue(setSettings, key, event.target.value)} />
               </label>
             ))}
           </div>
         )}
-        <button className="dashboard-primary-link justify-self-start" type="submit" disabled={isSaving || isLoading}>
+        <button className={`${primaryLinkClass} justify-self-start`} type="submit" disabled={isSaving || isLoading}>
           {isSaving ? "Saving..." : "Save Settings"}
         </button>
       </form>
@@ -1812,11 +1885,18 @@ function SettingsPage() {
   );
 }
 
-function DashboardListPage({ children, emptyIcon: EmptyIcon, emptyText, emptyTitle, error, isLoading, rows, title }) {
+function DashboardListPage({ children, description, emptyIcon: EmptyIcon, emptyText, emptyTitle, error, eyebrow, isLoading, rows, title }) {
   return (
-    <section className="dashboard-packages-page" aria-label={title}>
-      <article className="dashboard-panel grid gap-3">
-        {error && <p className="dashboard-inline-error">{error}</p>}
+    <section className="grid gap-4" aria-label={title}>
+      {(eyebrow || description) && (
+        <div>
+          {eyebrow && sectionEyebrow(eyebrow)}
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">{title}</h2>
+          {description && <p className="mt-2 text-sm font-medium text-[#687265]">{description}</p>}
+        </div>
+      )}
+      <article className={`${panelClass} grid gap-3`}>
+        {error && <p className={inlineErrorClass}>{error}</p>}
         {!error && isLoading && <EmptyState icon={EmptyIcon} title={`Loading ${title.toLowerCase()}`} text="Please wait while we fetch the latest data." />}
         {!error && !isLoading && rows.length === 0 && <EmptyState icon={EmptyIcon} title={emptyTitle} text={emptyText} />}
         {!error && !isLoading && rows.length > 0 && children}
@@ -1827,10 +1907,10 @@ function DashboardListPage({ children, emptyIcon: EmptyIcon, emptyText, emptyTit
 
 function EmptyState({ icon: Icon, text, title }) {
   return (
-    <div className="dashboard-empty-state">
-      <Icon aria-hidden="true" />
-      <strong>{title}</strong>
-      <span>{text}</span>
+    <div className={emptyStateClass}>
+      <Icon className="h-[42px] w-[42px] text-[#0b2a12]" aria-hidden="true" />
+      <strong className="text-lg font-black text-[#0b2a12]">{title}</strong>
+      <span className="max-w-[420px] text-sm font-bold text-[#687265]">{text}</span>
     </div>
   );
 }

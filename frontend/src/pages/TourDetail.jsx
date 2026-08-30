@@ -33,6 +33,7 @@ import lakeBunyonyiImage from '../assets/Destinations/Uganda/Lake Bunyonyi.png'
 import serengetiImage from '../assets/Destinations/Tanzania/Serengeti National Park.png'
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
+const uploadBaseUrl = getUploadBaseUrl()
 
 const fallbackGallery = [gorillaImage, volcanoImage, kigaliImage, nyungweImage]
 const tourPanelClass =
@@ -731,15 +732,36 @@ function getLowestPrice(prices = []) {
 }
 
 function mediaPreviewUrl(url) {
-  if (!url || url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+  if (!url || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url
+  }
+
+  if (/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/uploads/i.test(url)) {
+    return `${uploadBaseUrl}${new URL(url).pathname}`
+  }
+
+  if (url.startsWith('http')) {
     return url
   }
 
   if (url.startsWith('/uploads')) {
-    return `${apiBaseUrl}${url}`
+    return `${uploadBaseUrl}${url}`
   }
 
   return url
+}
+
+function getUploadBaseUrl() {
+  if (typeof window === 'undefined') {
+    return apiBaseUrl
+  }
+
+  const apiHost = new URL(apiBaseUrl, window.location.origin).hostname
+  const pageHost = window.location.hostname
+  const apiIsLocal = apiHost === '127.0.0.1' || apiHost === 'localhost'
+  const pageIsLocal = pageHost === '127.0.0.1' || pageHost === 'localhost'
+
+  return apiIsLocal && !pageIsLocal ? '' : apiBaseUrl
 }
 
 function richTextOrParagraph(value) {
