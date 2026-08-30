@@ -1,6 +1,7 @@
 import { ArrowRight, Clock, Headphones, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { useState } from 'react'
 import akageraImage from '../assets/Destinations/akagera.png'
-import kigaliImage from '../assets/Destinations/Kigali.jpg'
+import { createTourInquiry } from '../services/tourService.js'
 
 const contactCards = [
   {
@@ -27,14 +28,119 @@ const contactCards = [
   },
 ]
 
-const formFields = [
-  { id: 'fullName', label: 'Full Name *', type: 'text' },
+const contactFormFields = [
+  { id: 'name', label: 'Full Name *', type: 'text' },
   { id: 'email', label: 'Email Address *', type: 'email' },
   { id: 'phone', label: 'Phone Number', type: 'tel' },
   { id: 'subject', label: 'Subject', type: 'text' },
 ]
 
+const consultancyOptions = [
+  'Gorilla tracking',
+  'Safari and wildlife',
+  'Culture and heritage',
+  'Family or private tour',
+  'Educational tour',
+  'Group travel',
+  'Other',
+]
+
 function ContactUs() {
+  const [contactForm, setContactForm] = useState({
+    email: '',
+    message: '',
+    name: '',
+    phone: '',
+    subject: '',
+  })
+  const [consultancyForm, setConsultancyForm] = useState({
+    email: '',
+    interest: '',
+    message: '',
+    name: '',
+    phone: '',
+  })
+  const [contactSubmitState, setContactSubmitState] = useState('idle')
+  const [contactSubmitMessage, setContactSubmitMessage] = useState('')
+  const [consultancySubmitState, setConsultancySubmitState] = useState('idle')
+  const [consultancySubmitMessage, setConsultancySubmitMessage] = useState('')
+
+  function updateContactField(event) {
+    const { name, value } = event.target
+    setContactForm((current) => ({ ...current, [name]: value }))
+  }
+
+  function updateConsultancyField(event) {
+    const { name, value } = event.target
+    setConsultancyForm((current) => ({ ...current, [name]: value }))
+  }
+
+  async function handleContactSubmit(event) {
+    event.preventDefault()
+    setContactSubmitState('sending')
+    setContactSubmitMessage('')
+
+    try {
+      await createTourInquiry({
+        email: contactForm.email,
+        inquiry: [
+          'Contact Message',
+          `Subject: ${contactForm.subject || 'Not specified'}`,
+          '',
+          contactForm.message,
+        ].join('\n'),
+        name: contactForm.name,
+        phone: contactForm.phone,
+        status: 'new',
+      })
+      setContactForm({
+        email: '',
+        message: '',
+        name: '',
+        phone: '',
+        subject: '',
+      })
+      setContactSubmitState('sent')
+      setContactSubmitMessage('Thank you. Your message has been sent.')
+    } catch (error) {
+      setContactSubmitState('error')
+      setContactSubmitMessage(error.message || 'We could not send your message. Please try again.')
+    }
+  }
+
+  async function handleConsultancySubmit(event) {
+    event.preventDefault()
+    setConsultancySubmitState('sending')
+    setConsultancySubmitMessage('')
+
+    try {
+      await createTourInquiry({
+        email: consultancyForm.email,
+        inquiry: [
+          'Tour Consultancy Request',
+          `Interested In: ${consultancyForm.interest}`,
+          '',
+          consultancyForm.message,
+        ].join('\n'),
+        name: consultancyForm.name,
+        phone: consultancyForm.phone,
+        status: 'new',
+      })
+      setConsultancyForm({
+        email: '',
+        interest: '',
+        message: '',
+        name: '',
+        phone: '',
+      })
+      setConsultancySubmitState('sent')
+      setConsultancySubmitMessage('Thank you. Your consultancy request has been sent.')
+    } catch (error) {
+      setConsultancySubmitState('error')
+      setConsultancySubmitMessage(error.message || 'We could not send your request. Please try again.')
+    }
+  }
+
   return (
     <>
       <section className="contact-hero relative isolate flex min-h-[215px] items-center overflow-hidden px-5 text-white">
@@ -47,18 +153,18 @@ function ContactUs() {
         </div>
       </section>
 
-      <section className="contact-intro-section bg-white px-5 pb-[54px] pt-[72px] text-center">
+      <section className="contact-intro-section bg-white px-5 pb-9 pt-14 text-center">
         <div className="mx-auto max-w-[760px]">
           <p className="contact-kicker">WE&apos;D LOVE TO HEAR FROM YOU</p>
           <h2 className="contact-title mt-4">Let&apos;s Plan Your Next Journey</h2>
-          <div className="mx-auto mt-5 max-w-[720px] space-y-2 text-[17px] font-semibold leading-[1.65] text-[#2f3f34]">
+          <div className="mx-auto mt-4 max-w-[720px] space-y-1 text-[15px] font-semibold leading-[1.55] text-[#2f3f34]">
             <p>Have a question, need travel advice, or ready to start planning your trip?</p>
             <p>Our team is here to help you create an unforgettable East African experience.</p>
           </div>
         </div>
       </section>
 
-      <section className="bg-white px-5 pb-[76px]">
+      <section className="bg-white px-5 pb-7">
         <div className="mx-auto grid max-w-[1120px] gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {contactCards.map((card) => (
             <article key={card.title} className="contact-info-card">
@@ -82,54 +188,142 @@ function ContactUs() {
         </div>
       </section>
 
-      <section className="bg-white px-5 pb-[82px]">
-        <div className="mx-auto grid max-w-[1120px] gap-10 lg:grid-cols-[1fr_0.93fr] lg:items-start">
+      <section className="bg-white px-5 pb-8">
+        <div className="contact-forms-grid mx-auto grid max-w-[1120px] gap-6 lg:grid-cols-[1.42fr_1fr]">
           <div className="contact-form-panel">
-            <h2>Send Us a Message</h2>
+            <h2>Get in Touch</h2>
             <span className="contact-title-line" />
-            <p className="mt-5 max-w-[560px] text-[15px] font-semibold leading-[1.75] text-[#536156]">
-              Share a few details about your trip idea and our planning team will help shape it into a thoughtful
-              East African journey.
+            <p className="mt-4 max-w-[560px] text-[14px] font-semibold leading-[1.55] text-[#536156]">
+              Have a question or need more information? Send us a message and we&apos;ll get back to you soon.
             </p>
 
-            <form className="mt-8 grid gap-5" aria-label="Contact form">
-              <div className="grid gap-5 sm:grid-cols-2">
-                {formFields.map((field) => (
+            <form className="mt-5 grid gap-3" aria-label="Contact form" onSubmit={handleContactSubmit}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {contactFormFields.map((field) => (
                   <label key={field.id} className="contact-field" htmlFor={field.id}>
                     <span>{field.label}</span>
-                    <input id={field.id} name={field.id} type={field.type} />
+                    <input
+                      id={field.id}
+                      name={field.id}
+                      type={field.type}
+                      value={contactForm[field.id]}
+                      onChange={updateContactField}
+                      required={field.id === 'name' || field.id === 'email'}
+                    />
                   </label>
                 ))}
               </div>
-              <label className="contact-field" htmlFor="message">
+              <label className="contact-field contact-message-field" htmlFor="contact-message">
                 <span>Your Message *</span>
-                <textarea id="message" name="message" rows="6" />
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows="5"
+                  value={contactForm.message}
+                  onChange={updateContactField}
+                  required
+                />
               </label>
-              <button className="contact-submit" type="button">
-                Send Message <ArrowRight className="icon-link ml-2" aria-hidden="true" />
+              <button className="contact-submit" type="submit" disabled={contactSubmitState === 'sending'}>
+                {contactSubmitState === 'sending' ? 'Sending...' : 'Send Message'}
+                <ArrowRight className="icon-link ml-2" aria-hidden="true" />
               </button>
+              {contactSubmitMessage && (
+                <p className={`contact-form-status ${contactSubmitState === 'error' ? 'is-error' : ''}`}>
+                  {contactSubmitMessage}
+                </p>
+              )}
             </form>
           </div>
 
-          <aside className="contact-location-card" aria-label="IMIGANI location in Kigali">
-            <img src={kigaliImage} alt="Kigali city view in Rwanda" />
-            <div className="contact-map-panel">
-              <span className="contact-map-pin" aria-hidden="true">
-                <MapPin />
-              </span>
-              <div className="contact-location-note">
-                <p>Find Us Here</p>
-                <address>KN 5 Rd, Nyarugenge District, Kigali, Rwanda</address>
-                <a href="https://maps.google.com/?q=KN%205%20Rd%20Nyarugenge%20District%20Kigali%20Rwanda">
-                  View on Google Maps <ArrowRight className="icon-link" aria-hidden="true" />
-                </a>
-              </div>
-            </div>
-          </aside>
+          <div className="contact-form-panel contact-consultancy-panel">
+            <h2>Request Consultancy</h2>
+            <span className="contact-title-line" />
+            <p className="mt-4 max-w-[520px] text-[14px] font-semibold leading-[1.55] text-[#536156]">
+              Tell us what you need help with and our travel experts will guide you with clear advice.
+            </p>
+
+            <form
+              className="mt-5 grid gap-3"
+              aria-label="Tour consultancy request form"
+              onSubmit={handleConsultancySubmit}
+            >
+              <label className="contact-field" htmlFor="consultancy-name">
+                <span>Full Name *</span>
+                <input
+                  id="consultancy-name"
+                  name="name"
+                  type="text"
+                  value={consultancyForm.name}
+                  onChange={updateConsultancyField}
+                  required
+                />
+              </label>
+              <label className="contact-field" htmlFor="consultancy-email">
+                <span>Email Address *</span>
+                <input
+                  id="consultancy-email"
+                  name="email"
+                  type="email"
+                  value={consultancyForm.email}
+                  onChange={updateConsultancyField}
+                  required
+                />
+              </label>
+              <label className="contact-field" htmlFor="consultancy-phone">
+                <span>Phone Number *</span>
+                <input
+                  id="consultancy-phone"
+                  name="phone"
+                  type="tel"
+                  value={consultancyForm.phone}
+                  onChange={updateConsultancyField}
+                  required
+                />
+              </label>
+              <label className="contact-field" htmlFor="consultancy-interest">
+                <span>I&apos;m interested in *</span>
+                <select
+                  id="consultancy-interest"
+                  name="interest"
+                  value={consultancyForm.interest}
+                  onChange={updateConsultancyField}
+                  required
+                >
+                  <option value="">Select an option</option>
+                  {consultancyOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="contact-field contact-message-field" htmlFor="consultancy-message">
+                <span>Tell us more about your plans *</span>
+                <textarea
+                  id="consultancy-message"
+                  name="message"
+                  rows="4"
+                  value={consultancyForm.message}
+                  onChange={updateConsultancyField}
+                  required
+                />
+              </label>
+              <button className="contact-submit" type="submit" disabled={consultancySubmitState === 'sending'}>
+                {consultancySubmitState === 'sending' ? 'Sending...' : 'Request Consultancy'}
+                <ArrowRight className="icon-link ml-2" aria-hidden="true" />
+              </button>
+              {consultancySubmitMessage && (
+                <p className={`contact-form-status ${consultancySubmitState === 'error' ? 'is-error' : ''}`}>
+                  {consultancySubmitMessage}
+                </p>
+              )}
+            </form>
+          </div>
         </div>
       </section>
 
-      <section className="bg-white px-5 pb-[88px]">
+      <section className="bg-white px-5 pb-[72px]">
         <div className="contact-assistance-strip mx-auto flex max-w-[1120px] flex-col items-start justify-between gap-7 lg:flex-row lg:items-center">
           <div className="flex items-start gap-5">
             <span className="contact-assist-icon">

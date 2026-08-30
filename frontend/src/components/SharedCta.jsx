@@ -1,8 +1,11 @@
 import { ArrowRight } from 'lucide-react'
+import { usePlanVisit } from '../contexts/PlanVisitContext.jsx'
 
 function SharedCta() {
+  const { openPlanVisit } = usePlanVisit()
+
   return (
-    <section className="bg-[#102f16] px-5 py-[62px] text-white">
+    <section className="shared-cta bg-[#102f16] px-5 py-[62px] text-white">
       <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-7 text-center lg:flex-row lg:text-left">
         <div className="max-w-[720px]">
           <h2 className="text-[32px] font-bold leading-tight sm:text-[42px]">Let’s Create Your Story</h2>
@@ -11,9 +14,9 @@ function SharedCta() {
             meaningful, and unforgettable.
           </p>
         </div>
-        <a className="cta-button" href="mailto:info@imiganisafarisandtours.com">
+        <button className="cta-button" type="button" onClick={openPlanVisit}>
           Plan Your Journey Today <ArrowRight className="ml-2 icon-link" aria-hidden="true" />
-        </a>
+        </button>
       </div>
     </section>
   )

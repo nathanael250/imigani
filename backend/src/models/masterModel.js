@@ -1,4 +1,11 @@
 import commands from "../config/command.js";
+import {
+  createBlogPost,
+  deleteBlogPost,
+  getBlogPost,
+  listBlogPosts,
+  updateBlogPost,
+} from "./blogModel.js";
 import { getDashboardSummary } from "./dashboardModel.js";
 import {
   createDestination,
@@ -6,7 +13,19 @@ import {
   listDestinations,
   updateDestination,
 } from "./destinationModel.js";
-import { createInquiry, listInquiries, updateInquiryStatus } from "./inquiryModel.js";
+import { createInquiry, listInquiries, markInquiryRead, updateInquiryStatus } from "./inquiryModel.js";
+import {
+  listNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "./notificationModel.js";
+import { createReview, deleteReview, listReviews, updateReview } from "./reviewModel.js";
+import { getSettings, updateSettings } from "./settingsModel.js";
+import {
+  createSubscriber,
+  listSubscribers,
+  updateSubscriberStatus,
+} from "./subscriberModel.js";
 import {
   createTour,
   createTourCategory,
@@ -40,6 +59,24 @@ const requestHandlers = {
 
   "dashboard.summary": getDashboardSummary,
 
+  "notifications.list": listNotifications,
+  "notifications.markRead": markNotificationRead,
+  "notifications.markAllRead": markAllNotificationsRead,
+
+  "blogs.create": createBlogPost,
+  "blogs.delete": deleteBlogPost,
+  "blogs.get": getBlogPost,
+  "blogs.list": listBlogPosts,
+  "blogs.update": updateBlogPost,
+
+  "reviews.create": createReview,
+  "reviews.delete": deleteReview,
+  "reviews.list": listReviews,
+  "reviews.update": updateReview,
+
+  "settings.get": getSettings,
+  "settings.update": updateSettings,
+
   "tourCategories.create": createTourCategory,
   "tourCategories.delete": deleteTourCategory,
   "tourCategories.list": listTourCategories,
@@ -62,7 +99,12 @@ const requestHandlers = {
 
   "inquiries.create": createInquiry,
   "inquiries.list": listInquiries,
+  "inquiries.markRead": markInquiryRead,
   "inquiries.updateStatus": updateInquiryStatus,
+
+  "subscribers.create": createSubscriber,
+  "subscribers.list": listSubscribers,
+  "subscribers.updateStatus": updateSubscriberStatus,
 
   "tripPlans.create": createTripPlan,
   "tripPlans.list": listTripPlans,
@@ -81,6 +123,24 @@ const commandToRequest = {
   [commands.UPLOAD_MEDIA]: "media.upload",
 
   [commands.DASHBOARD_SUMMARY]: "dashboard.summary",
+
+  [commands.LIST_NOTIFICATIONS]: "notifications.list",
+  [commands.MARK_NOTIFICATION_READ]: "notifications.markRead",
+  [commands.MARK_ALL_NOTIFICATIONS_READ]: "notifications.markAllRead",
+
+  [commands.LIST_BLOG_POSTS]: "blogs.list",
+  [commands.GET_BLOG_POST]: "blogs.get",
+  [commands.CREATE_BLOG_POST]: "blogs.create",
+  [commands.UPDATE_BLOG_POST]: "blogs.update",
+  [commands.DELETE_BLOG_POST]: "blogs.delete",
+
+  [commands.LIST_REVIEWS]: "reviews.list",
+  [commands.CREATE_REVIEW]: "reviews.create",
+  [commands.UPDATE_REVIEW]: "reviews.update",
+  [commands.DELETE_REVIEW]: "reviews.delete",
+
+  [commands.GET_SETTINGS]: "settings.get",
+  [commands.UPDATE_SETTINGS]: "settings.update",
 
   [commands.LIST_TOUR_CATEGORIES]: "tourCategories.list",
   [commands.CREATE_TOUR_CATEGORY]: "tourCategories.create",
@@ -104,7 +164,12 @@ const commandToRequest = {
 
   [commands.LIST_INQUIRIES]: "inquiries.list",
   [commands.CREATE_INQUIRY]: "inquiries.create",
+  [commands.MARK_INQUIRY_READ]: "inquiries.markRead",
   [commands.UPDATE_INQUIRY_STATUS]: "inquiries.updateStatus",
+
+  [commands.LIST_SUBSCRIBERS]: "subscribers.list",
+  [commands.CREATE_SUBSCRIBER]: "subscribers.create",
+  [commands.UPDATE_SUBSCRIBER_STATUS]: "subscribers.updateStatus",
 
   [commands.LIST_TRIP_PLANS]: "tripPlans.list",
   [commands.CREATE_TRIP_PLAN]: "tripPlans.create",

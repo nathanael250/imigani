@@ -38,7 +38,7 @@ function Login() {
             <KeyRound />
           </div>
           <h1>Management Portal</h1>
-          <p>Manage tour packages, bookings, destinations and more - all in one place</p>
+          <p>Manage tour packages, requests, destinations and more - all in one place</p>
         </div>
 
         <form className="login-card" onSubmit={handleSubmit}>

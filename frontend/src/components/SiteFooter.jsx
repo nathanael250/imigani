@@ -25,7 +25,7 @@ const popularExperiences = [
 function SiteFooter() {
   return (
     <footer id="contact-us" className="bg-white px-5 pt-[58px] text-[#28342b]">
-      <div className="mx-auto grid max-w-[1120px] gap-10 pb-12 md:grid-cols-2 lg:grid-cols-[1.1fr_0.82fr_1.25fr_1fr]">
+      <div className="footer-grid mx-auto grid max-w-[1120px] gap-10 pb-12 md:grid-cols-2 lg:grid-cols-[1.1fr_0.82fr_1.25fr_1fr]">
         <div>
           <img className="h-[92px] w-[92px] object-contain" src={logoMark} alt="IMIGANI Safaris and Tours" />
           <p className="mt-5 max-w-[285px] text-[15px] font-medium leading-[1.75] text-[#5e6b63]">

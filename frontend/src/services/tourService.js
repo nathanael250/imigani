@@ -16,6 +16,18 @@ export function listTourCategories(params = {}) {
   return apiRequest('LIST_TOUR_CATEGORIES', params)
 }
 
+export function createTourCategory(data = {}) {
+  return apiRequest('CREATE_TOUR_CATEGORY', data)
+}
+
+export function updateTourCategory(id, data = {}) {
+  return apiRequest('UPDATE_TOUR_CATEGORY', { ...data, id })
+}
+
+export function deleteTourCategory(id) {
+  return apiRequest('DELETE_TOUR_CATEGORY', { id })
+}
+
 export function getTourPackageLookups() {
   return apiRequest('TOUR_PACKAGE_LOOKUPS')
 }

@@ -1,9 +1,43 @@
-import { FileText } from 'lucide-react'
+import { ArrowRight, FileText } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import akageraImage from '../assets/Destinations/akagera.png'
+import { listBlogPosts } from '../services/dashboardService'
 
-const articles = []
+const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
 
 function Blog() {
+  const [articles, setArticles] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadPosts() {
+      try {
+        const posts = await listBlogPosts({ filters: { status: 'published' }, limit: 100 })
+
+        if (isMounted) {
+          setArticles(Array.isArray(posts) ? posts : [])
+        }
+      } catch {
+        if (isMounted) {
+          setArticles([])
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadPosts()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   return (
     <>
       <section className="blog-hero relative isolate flex min-h-[215px] items-center overflow-hidden px-5 text-white">
@@ -26,22 +60,36 @@ function Blog() {
             </p>
           </div>
 
-          {articles.length > 0 ? (
+          {isLoading ? (
+            <div className="mt-12 rounded-[10px] border border-[#d7e2d5] bg-white px-6 py-10 text-center text-[15px] font-bold text-[#627064]">
+              Loading blog posts...
+            </div>
+          ) : articles.length > 0 ? (
             <div className="blog-grid">
-              {articles.map((article) => (
-                <article className="blog-card" key={article.title}>
-                  <a className="blog-card-image" href="#" aria-label={article.title}>
-                    <img src={article.image} alt={article.alt} />
-                  </a>
+              {articles.map((article) => {
+                const articlePath = `/blog/${article.slug || article.id}`
+
+                return (
+                  <article className="blog-card" key={article.id || article.slug || article.title}>
+                    <Link className="blog-card-image" to={articlePath} aria-label={article.title}>
+                      <img src={mediaPreviewUrl(article.cover_image_url) || akageraImage} alt="" />
+                    </Link>
                   <div className="blog-card-body">
-                    <p className="blog-card-meta">{article.meta}</p>
+                    <p className="blog-card-meta">{article.category || 'IMIGANI STORIES'}</p>
                     <h3>
-                      <a href="#">{article.title}</a>
+                      <Link to={articlePath}>{article.title}</Link>
                     </h3>
-                    <p className="blog-card-excerpt">{article.excerpt}</p>
+                    <p className="blog-card-excerpt">{plainTextSummary(article.content, 140)}</p>
+                    <div className="blog-card-footer">
+                      <span>{formatDate(article.published_at || article.created_at)}</span>
+                      <Link className="blog-read-link" to={articlePath}>
+                        Read Story <ArrowRight className="icon-link" aria-hidden="true" />
+                      </Link>
+                    </div>
                   </div>
                 </article>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="mt-12 flex min-h-[320px] flex-col items-center justify-center rounded-[10px] border border-[#d7e2d5] bg-white px-6 py-14 text-center shadow-[0_18px_45px_rgba(10,35,17,0.08)]">
@@ -59,6 +107,39 @@ function Blog() {
       </section>
     </>
   )
+}
+
+function formatDate(date) {
+  if (!date) return 'Not dated'
+
+  return new Intl.DateTimeFormat('en', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(date))
+}
+
+function plainTextSummary(value, maxLength = 140) {
+  const text = String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (text.length <= maxLength) return text
+
+  return `${text.slice(0, maxLength - 1).trim()}...`
+}
+
+function mediaPreviewUrl(url) {
+  if (!url || url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url
+  }
+
+  if (url.startsWith('/uploads')) {
+    return `${apiBaseUrl}${url}`
+  }
+
+  return url
 }
 
 export default Blog

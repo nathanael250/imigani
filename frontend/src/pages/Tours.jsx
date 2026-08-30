@@ -1,6 +1,7 @@
-import { ArrowRight, Check, ChevronRight, Clock3, Heart, SlidersHorizontal } from 'lucide-react'
+import { ArrowRight, Check, ChevronDown, ChevronRight, Clock3, Heart, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { usePlanVisit } from '../contexts/PlanVisitContext.jsx'
 import { listTourCategories, listTours } from '../services/tourService'
 import gorillaImage from '../assets/gollira.png'
 import akageraImage from '../assets/Destinations/akagera.png'
@@ -184,12 +185,14 @@ const durationFilters = [
 ]
 
 function Tours() {
+  const { openPlanVisit } = usePlanVisit()
   const [apiCategories, setApiCategories] = useState([])
   const [apiTours, setApiTours] = useState([])
   const [selectedCategories, setSelectedCategories] = useState(new Set())
   const [selectedDurations, setSelectedDurations] = useState(new Set())
   const [selectedMaxPrice, setSelectedMaxPrice] = useState(null)
   const [sortBy, setSortBy] = useState('recommended')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -272,60 +275,72 @@ function Tours() {
 
       <section className="tours-section bg-white px-5 py-[76px]">
         <div className="mx-auto grid max-w-[1120px] gap-9 lg:grid-cols-[276px_minmax(0,1fr)] lg:items-start">
-          <aside className="tours-filter-card" aria-label="Tour filters">
+          <aside className={`tours-filter-card${isFilterOpen ? ' is-open' : ''}`} aria-label="Tour filters">
             <div className="tours-filter-heading">
               <span>
                 <SlidersHorizontal aria-hidden="true" />
               </span>
               <h2>Filter Tours</h2>
+              <button
+                className="tours-filter-toggle"
+                type="button"
+                aria-expanded={isFilterOpen}
+                aria-controls="tour-filter-body"
+                onClick={() => setIsFilterOpen((current) => !current)}
+              >
+                {isFilterOpen ? 'Hide' : 'Show'}
+                <ChevronDown aria-hidden="true" />
+              </button>
             </div>
 
-            <FilterGroup
-              title="Categories"
-              items={categoryOptions}
-              selectedItems={selectedCategories}
-              onToggle={(category) => toggleSetValue(setSelectedCategories, category)}
-            />
-            <FilterGroup
-              title="Duration"
-              items={durationOptions}
-              selectedItems={selectedDurations}
-              onToggle={(duration) => toggleSetValue(setSelectedDurations, duration)}
-            />
+            <div id="tour-filter-body" className="tours-filter-body">
+              <FilterGroup
+                title="Categories"
+                items={categoryOptions}
+                selectedItems={selectedCategories}
+                onToggle={(category) => toggleSetValue(setSelectedCategories, category)}
+              />
+              <FilterGroup
+                title="Duration"
+                items={durationOptions}
+                selectedItems={selectedDurations}
+                onToggle={(duration) => toggleSetValue(setSelectedDurations, duration)}
+              />
 
-            <div className="tours-filter-group">
-              <h3>Price Range</h3>
-              <label className="mt-4 block">
-                <span className="sr-only">Maximum tour price</span>
-                <input
-                  className="h-1.5 w-full cursor-pointer accent-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-40"
-                  type="range"
-                  min={priceRange.min}
-                  max={priceRange.max}
-                  step={getPriceStep(priceRange)}
-                  value={activeMaxPrice}
-                  disabled={priceRange.max <= 0}
-                  onChange={(event) => setSelectedMaxPrice(Number(event.target.value))}
-                />
-              </label>
-              <div className="tours-range-values">
-                <span>{formatMoney(priceRange.min)}</span>
-                <span>{formatMoney(activeMaxPrice)}+</span>
+              <div className="tours-filter-group">
+                <h3>Price Range</h3>
+                <label className="mt-4 block">
+                  <span className="sr-only">Maximum tour price</span>
+                  <input
+                    className="h-1.5 w-full cursor-pointer accent-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-40"
+                    type="range"
+                    min={priceRange.min}
+                    max={priceRange.max}
+                    step={getPriceStep(priceRange)}
+                    value={activeMaxPrice}
+                    disabled={priceRange.max <= 0}
+                    onChange={(event) => setSelectedMaxPrice(Number(event.target.value))}
+                  />
+                </label>
+                <div className="tours-range-values">
+                  <span>{formatMoney(priceRange.min)}</span>
+                  <span>{formatMoney(activeMaxPrice)}+</span>
+                </div>
+                <p className="mt-2 text-[12px] font-bold text-[#536057]">Showing tours up to {formatMoney(activeMaxPrice)}</p>
               </div>
-              <p className="mt-2 text-[12px] font-bold text-[#536057]">Showing tours up to {formatMoney(activeMaxPrice)}</p>
-            </div>
 
-            <button
-              className="tours-apply-button"
-              type="button"
-              onClick={() => {
-                setSelectedCategories(new Set())
-                setSelectedDurations(new Set())
-                setSelectedMaxPrice(priceRange.max || null)
-              }}
-            >
-              Clear Filters
-            </button>
+              <button
+                className="tours-apply-button"
+                type="button"
+                onClick={() => {
+                  setSelectedCategories(new Set())
+                  setSelectedDurations(new Set())
+                  setSelectedMaxPrice(priceRange.max || null)
+                }}
+              >
+                Clear Filters
+              </button>
+            </div>
           </aside>
 
           <div className="min-w-0">
@@ -380,9 +395,9 @@ function Tours() {
                 <p>Need a custom route?</p>
                 <h2>Can&apos;t find what you&apos;re looking for?</h2>
               </div>
-              <Link className="tours-helper-button" to="/contact-us">
-                Contact Us <ArrowRight aria-hidden="true" />
-              </Link>
+              <button className="tours-helper-button" type="button" onClick={openPlanVisit}>
+                Plan Custom Trip <ArrowRight aria-hidden="true" />
+              </button>
             </section>
           </div>
         </div>

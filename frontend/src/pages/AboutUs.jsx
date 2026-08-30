@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import SectionHeading from '../components/SectionHeading.jsx'
 import VisionCard from '../components/VisionCard.jsx'
+import { usePlanVisit } from '../contexts/PlanVisitContext.jsx'
 import imiganiStoryImage from '../assets/AboutUs/Imigani_Story.png'
 import planJourneyImage from '../assets/AboutUs/plan your journey.png'
 import rwandaImage from '../assets/Rwanda.png'
@@ -48,6 +49,8 @@ const aboutValues = [
 ]
 
 function AboutUs() {
+  const { openPlanVisit } = usePlanVisit()
+
   return (
     <>
       <section className="about-hero relative isolate flex min-h-[175px] items-center overflow-hidden px-5 text-white">
@@ -158,9 +161,13 @@ function AboutUs() {
               </p>
               <p>We will help turn your idea into a thoughtfully designed East African journey.</p>
             </div>
-            <a className="mt-7 inline-flex min-h-[44px] items-center rounded bg-[#b77b2d] px-8 text-[15px] font-bold text-white transition hover:bg-[#855113]" href="mailto:info@imiganisafarisandtours.com">
+            <button
+              className="mt-7 inline-flex min-h-[44px] items-center rounded bg-[#b77b2d] px-8 text-[15px] font-bold text-white transition hover:bg-[#855113]"
+              type="button"
+              onClick={openPlanVisit}
+            >
               Start Planning
-            </a>
+            </button>
           </div>
           <img
             className="about-illustration-image"
