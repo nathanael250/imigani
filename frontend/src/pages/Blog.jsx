@@ -5,6 +5,7 @@ import akageraImage from '../assets/Destinations/akagera.png'
 import { listBlogPosts } from '../services/dashboardService'
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
+const uploadBaseUrl = getUploadBaseUrl()
 
 function Blog() {
   const [articles, setArticles] = useState([])
@@ -81,6 +82,13 @@ function Blog() {
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.045]"
                         src={mediaPreviewUrl(article.cover_image_url) || akageraImage}
                         alt=""
+                        loading="lazy"
+                        onError={(event) => {
+                          if (!event.currentTarget.dataset.fallbackApplied) {
+                            event.currentTarget.dataset.fallbackApplied = 'true'
+                            event.currentTarget.src = akageraImage
+                          }
+                        }}
                       />
                     </Link>
                   <div className="flex min-h-0 flex-1 flex-col p-4 sm:min-h-[314px] sm:p-[25px_24px_23px]">
@@ -147,15 +155,36 @@ function plainTextSummary(value, maxLength = 140) {
 }
 
 function mediaPreviewUrl(url) {
-  if (!url || url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+  if (!url || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url
+  }
+
+  if (/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/uploads/i.test(url)) {
+    return `${uploadBaseUrl}${new URL(url).pathname}`
+  }
+
+  if (url.startsWith('http')) {
     return url
   }
 
   if (url.startsWith('/uploads')) {
-    return `${apiBaseUrl}${url}`
+    return `${uploadBaseUrl}${url}`
   }
 
   return url
+}
+
+function getUploadBaseUrl() {
+  if (typeof window === 'undefined') {
+    return apiBaseUrl
+  }
+
+  const apiHost = new URL(apiBaseUrl, window.location.origin).hostname
+  const pageHost = window.location.hostname
+  const apiIsLocal = apiHost === '127.0.0.1' || apiHost === 'localhost'
+  const pageIsLocal = pageHost === '127.0.0.1' || pageHost === 'localhost'
+
+  return apiIsLocal && !pageIsLocal ? '' : apiBaseUrl
 }
 
 export default Blog

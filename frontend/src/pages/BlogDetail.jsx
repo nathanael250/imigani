@@ -7,6 +7,7 @@ import { getBlogPost, listBlogPosts } from '../services/dashboardService'
 import { createSubscriber } from '../services/subscriberService'
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
+const uploadBaseUrl = getUploadBaseUrl()
 
 function BlogDetail() {
   const { slug } = useParams()
@@ -160,7 +161,7 @@ function BlogDetail() {
   return (
     <article className="blog-detail-page">
       <section className="blog-detail-hero-banner">
-        <img src={coverImage} alt="" />
+        <SafeImage src={coverImage} alt="" />
         <div className="blog-detail-hero-overlay" />
         <div className="blog-detail-hero-inner">
           <h1>Blog</h1>
@@ -211,7 +212,7 @@ function BlogDetail() {
               <span>{readingTime(article.content)} min read</span>
             </div>
 
-            <img className="blog-detail-cover" src={coverImage} alt={article.title} />
+            <SafeImage className="blog-detail-cover" src={coverImage} alt={article.title} />
 
             <div
               className="blog-detail-content"
@@ -282,7 +283,7 @@ function BlogDetail() {
                 {relatedPosts.length > 0 ? (
                   relatedPosts.map((post) => (
                     <Link className="blog-related-post" to={`/blog/${post.slug || post.id}`} key={post.id || post.slug || post.title}>
-                      <img src={mediaPreviewUrl(post.cover_image_url) || akageraImage} alt="" />
+                      <SafeImage src={mediaPreviewUrl(post.cover_image_url) || akageraImage} alt="" />
                       <span>
                         <small>{post.category || 'IMIGANI STORIES'}</small>
                         <strong>{post.title}</strong>
@@ -419,15 +420,53 @@ function normalizeLocalBlogPath(value) {
 }
 
 function mediaPreviewUrl(url) {
-  if (!url || url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) {
+  if (!url || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url
+  }
+
+  if (/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/uploads/i.test(url)) {
+    return `${uploadBaseUrl}${new URL(url).pathname}`
+  }
+
+  if (url.startsWith('http')) {
     return url
   }
 
   if (url.startsWith('/uploads')) {
-    return `${apiBaseUrl}${url}`
+    return `${uploadBaseUrl}${url}`
   }
 
   return url
+}
+
+function getUploadBaseUrl() {
+  if (typeof window === 'undefined') {
+    return apiBaseUrl
+  }
+
+  const apiHost = new URL(apiBaseUrl, window.location.origin).hostname
+  const pageHost = window.location.hostname
+  const apiIsLocal = apiHost === '127.0.0.1' || apiHost === 'localhost'
+  const pageIsLocal = pageHost === '127.0.0.1' || pageHost === 'localhost'
+
+  return apiIsLocal && !pageIsLocal ? '' : apiBaseUrl
+}
+
+function SafeImage({ alt, className = '', src }) {
+  return (
+    <img
+      className={className}
+      src={src || akageraImage}
+      alt={alt}
+      loading="lazy"
+      onError={(event) => {
+        if (!event.currentTarget.dataset.fallbackApplied) {
+          event.currentTarget.dataset.fallbackApplied = 'true'
+          event.currentTarget.src = akageraImage
+        }
+      }}
+    />
+  )
 }
 
 export default BlogDetail

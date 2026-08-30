@@ -334,7 +334,12 @@ function TourDetail() {
                 to={item.path || `/tours/${slugify(item.title)}`}
                 key={item.title}
               >
-                <img className="h-full min-h-[210px] w-full object-cover transition duration-500 group-hover:scale-[1.045]" src={item.image} alt="" />
+                <SafeImage
+                  className="h-full min-h-[210px] w-full object-cover transition duration-500 group-hover:scale-[1.045]"
+                  src={item.image}
+                  alt=""
+                  fallback={gorillaImage}
+                />
                 <span className="absolute bottom-[58px] left-4 right-4 z-[1] text-[11px] font-bold uppercase text-[#d3a14e]">{item.meta}</span>
                 <strong className="absolute bottom-[18px] left-4 right-4 z-[1] text-[17px] font-bold leading-[1.25]">{item.title}</strong>
               </Link>
@@ -363,7 +368,12 @@ function Gallery({ gallery, title }) {
         type="button"
         onClick={() => setLightboxOpen(true)}
       >
-        <img className="h-full min-h-[300px] w-full object-cover sm:min-h-[360px] min-[861px]:min-h-[468px]" src={activeImage} alt={title} />
+        <SafeImage
+          className="h-full min-h-[300px] w-full object-cover sm:min-h-[360px] min-[861px]:min-h-[468px]"
+          src={activeImage}
+          alt={title}
+          fallback={gorillaImage}
+        />
         <span className="absolute bottom-[18px] right-[18px] inline-flex items-center gap-2 rounded-[5px] bg-white/95 px-3 py-2.5 text-[12px] font-bold leading-none text-[#0b2a12] shadow-[0_12px_24px_rgba(7,24,11,0.18)]">
           <Camera className="h-4 w-4 text-[#855113] stroke-[2.2]" aria-hidden="true" />
           Open Gallery
@@ -384,7 +394,7 @@ function Gallery({ gallery, title }) {
               }
             }}
           >
-            <img className="h-full w-full object-cover" src={image} alt="" />
+            <SafeImage className="h-full w-full object-cover" src={image} alt="" fallback={gorillaImage} />
             {index === 2 ? (
               <span className="absolute inset-auto bottom-3 left-3 right-3 z-[1] inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-white/92 px-2.5 py-2 text-[11px] font-bold leading-[1.15] text-[#0b2a12]">
                 <Camera className="h-3.5 w-3.5 text-[#855113] stroke-[2.2]" aria-hidden="true" />
@@ -409,7 +419,12 @@ function Gallery({ gallery, title }) {
           >
             <X className="h-[22px] w-[22px] stroke-[2.5]" aria-hidden="true" />
           </button>
-          <img className="max-h-[72vh] w-[min(980px,100%)] rounded-[8px] object-contain shadow-[0_28px_70px_rgba(0,0,0,0.34)]" src={activeImage} alt={title} />
+          <SafeImage
+            className="max-h-[72vh] w-[min(980px,100%)] rounded-[8px] object-contain shadow-[0_28px_70px_rgba(0,0,0,0.34)]"
+            src={activeImage}
+            alt={title}
+            fallback={gorillaImage}
+          />
           <div className="flex max-w-[min(980px,100%)] gap-2.5 overflow-x-auto pb-1">
             {gallery.map((image, index) => (
               <button
@@ -421,13 +436,29 @@ function Gallery({ gallery, title }) {
                 aria-label={`Show photo ${index + 1}`}
                 onClick={() => setActiveIndex(index)}
               >
-                <img className="h-full w-full object-cover" src={image} alt="" />
+                <SafeImage className="h-full w-full object-cover" src={image} alt="" fallback={gorillaImage} />
               </button>
             ))}
           </div>
         </div>
       ) : null}
     </section>
+  )
+}
+
+function SafeImage({ alt, className, fallback = gorillaImage, src }) {
+  return (
+    <img
+      className={className}
+      src={src || fallback}
+      alt={alt}
+      loading="lazy"
+      onError={(event) => {
+        if (event.currentTarget.src !== fallback) {
+          event.currentTarget.src = fallback
+        }
+      }}
+    />
   )
 }
 
