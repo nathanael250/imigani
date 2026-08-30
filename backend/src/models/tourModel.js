@@ -50,10 +50,9 @@ export function deleteTourCategory(payload = {}) {
 export function listTours(payload = {}) {
   const filters = payload.filters || {};
   const clauses = [];
-  const params = {
-    limit: Number.isFinite(Number(payload.limit)) ? Number(payload.limit) : 50,
-    offset: Number.isFinite(Number(payload.offset)) ? Number(payload.offset) : 0,
-  };
+  const safeLimit = Number.isFinite(Number(payload.limit)) ? Math.max(1, Math.trunc(Number(payload.limit))) : 50;
+  const safeOffset = Number.isFinite(Number(payload.offset)) ? Math.max(0, Math.trunc(Number(payload.offset))) : 0;
+  const params = {};
 
   if (filters.status) {
     clauses.push("t.status = :status");
@@ -108,7 +107,7 @@ export function listTours(payload = {}) {
      LEFT JOIN tour_categories tc ON tc.id = t.category_id
      ${where}
      ORDER BY t.created_at DESC
-     LIMIT :limit OFFSET :offset`,
+     LIMIT ${safeLimit} OFFSET ${safeOffset}`,
     params,
   );
 }

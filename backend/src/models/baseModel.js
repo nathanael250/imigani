@@ -40,12 +40,9 @@ export async function listRows(table, options = {}) {
   } = options;
 
   const clauses = [];
-  const safeLimit = Number.isFinite(Number(limit)) ? Number(limit) : 50;
-  const safeOffset = Number.isFinite(Number(offset)) ? Number(offset) : 0;
-  const params = {
-    limit: safeLimit,
-    offset: safeOffset,
-  };
+  const safeLimit = Number.isFinite(Number(limit)) ? Math.max(1, Math.trunc(Number(limit))) : 50;
+  const safeOffset = Number.isFinite(Number(offset)) ? Math.max(0, Math.trunc(Number(offset))) : 0;
+  const params = {};
 
   for (const [key, value] of Object.entries(filters)) {
     if (value === undefined || value === null || value === "") continue;
@@ -64,7 +61,7 @@ export async function listRows(table, options = {}) {
   const direction = orderDirection?.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
   return query(
-    `SELECT ${select} FROM ${table} ${where} ORDER BY ${orderBy} ${direction} LIMIT :limit OFFSET :offset`,
+    `SELECT ${select} FROM ${table} ${where} ORDER BY ${orderBy} ${direction} LIMIT ${safeLimit} OFFSET ${safeOffset}`,
     params,
   );
 }
