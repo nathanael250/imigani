@@ -40,10 +40,6 @@ function usePageReveal() {
 
     const contentSelector = [
       '.section-heading',
-      '.destination-card',
-      '.experience-card',
-      '.blog-card',
-      '.tour-card',
       '.blog-detail-cover',
       '.blog-detail-post-nav',
       '.blog-detail-sidebar-card',
@@ -55,10 +51,9 @@ function usePageReveal() {
       'section ol',
       'section form',
       'section a.cta-button',
-      'section a.hero-button',
     ].join(', ')
 
-    const cardSelector = '.destination-card, .experience-card, .blog-card, .tour-card, .blog-detail-sidebar-card'
+    const cardSelector = '.blog-detail-sidebar-card'
     const items = Array.from(root.querySelectorAll(contentSelector)).filter((item) => {
       const containingCard = item.closest(cardSelector)
 

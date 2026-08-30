@@ -53,8 +53,8 @@ function AboutUs() {
 
   return (
     <>
-      <section className="about-hero relative isolate flex min-h-[175px] items-center overflow-hidden px-5 text-white">
-        <img src={rwandaImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <section className="relative isolate flex min-h-[175px] items-center overflow-hidden px-5 text-white">
+        <img src={rwandaImage} alt="" className="absolute inset-0 h-full w-full object-cover object-[center_44%]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,11,0.72),rgba(65,43,16,0.45),rgba(7,24,11,0.42))]" />
         <div className="relative mx-auto w-full max-w-[1120px]">
           <h1 className="text-[42px] font-bold leading-tight sm:text-[54px]">About Us</h1>
@@ -62,16 +62,20 @@ function AboutUs() {
         </div>
       </section>
 
-      <section className="about-intro-section bg-white px-5 py-[82px]">
+      <section className="bg-white px-5 pb-[58px] pt-[50px] md:py-[82px]">
         <div className="mx-auto grid max-w-[1120px] gap-9 lg:grid-cols-[0.9fr_1fr] lg:items-center">
-          <img className="about-main-image" src={rwandaImage} alt="Mountain gorilla in Rwanda landscape" />
+          <img
+            className="hidden min-h-[620px] w-full rounded-[22px] object-cover object-center shadow-[0_24px_60px_rgba(11,42,18,0.12)] lg:block"
+            src={rwandaImage}
+            alt="Mountain gorilla in Rwanda landscape"
+          />
           <div>
-            <h2 className="about-title">
+            <h2 className="text-[31px] font-bold leading-[1.15] text-[#314836] sm:text-[clamp(34px,3.2vw,48px)]">
               Born in Rwanda.
-              <span>Inspired by Stories.</span>
+              <span className="block">Inspired by Stories.</span>
             </h2>
-            <span className="about-title-line" />
-            <div className="mt-6 space-y-5 text-[17px] font-medium leading-[1.55] text-[#263129]">
+            <span className="mt-[14px] block h-1 w-[82px] rounded-full bg-[#c6923d]" />
+            <div className="mt-5 space-y-5 text-[14px] font-medium leading-[1.58] text-[#263129] sm:mt-6 sm:text-[17px] sm:leading-[1.55]">
               <p>
                 IMIGANI is a boutique East African travel company creating authentic and meaningful journeys
                 through wildlife, adventure, culture, education, and storytelling.
@@ -105,7 +109,7 @@ function AboutUs() {
             {aboutValues.map((value) => (
               <article key={value.title} className="text-center">
                 <div className="mx-auto flex h-[62px] w-[62px] items-center justify-center rounded-full bg-[#a9c5b2] text-white">
-                  <value.Icon className="icon-about-value" aria-hidden="true" />
+                  <value.Icon className="h-7 w-7" aria-hidden="true" />
                 </div>
                 <h3 className="mt-5 text-[17px] font-bold text-[#263129]">{value.title}</h3>
                 <p className="mx-auto mt-4 max-w-[170px] text-[13px] font-semibold leading-[1.45] text-[#263129]">
@@ -137,7 +141,7 @@ function AboutUs() {
             </div>
           </div>
           <img
-            className="about-illustration-image"
+            className="w-[min(100%,520px)] justify-self-center object-contain"
             src={imiganiStoryImage}
             alt="Storytelling illustration for the meaning of IMIGANI"
           />
@@ -170,7 +174,7 @@ function AboutUs() {
             </button>
           </div>
           <img
-            className="about-illustration-image"
+            className="w-[min(100%,520px)] justify-self-center object-contain"
             src={planJourneyImage}
             alt="Traveler planning an East African journey"
           />

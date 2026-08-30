@@ -40,8 +40,8 @@ function Blog() {
 
   return (
     <>
-      <section className="blog-hero relative isolate flex min-h-[215px] items-center overflow-hidden px-5 text-white">
-        <img src={akageraImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <section className="relative isolate flex min-h-[215px] items-center overflow-hidden px-5 text-white">
+        <img src={akageraImage} alt="" className="absolute inset-0 h-full w-full object-cover object-[center_52%]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,11,0.78),rgba(117,78,23,0.46),rgba(7,24,11,0.32))]" />
         <div className="relative mx-auto w-full max-w-[1120px]">
           <h1 className="text-[46px] font-bold leading-tight sm:text-[56px]">Blog</h1>
@@ -49,12 +49,14 @@ function Blog() {
         </div>
       </section>
 
-      <section className="blog-section bg-white px-5 py-[76px]">
+      <section className="bg-white px-5 py-[62px] md:py-[76px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="max-w-[720px]">
-            <p className="blog-kicker">STORIES & INSIGHTS</p>
-            <h2 className="blog-title">From East Africa, With Stories</h2>
-            <p className="blog-intro">
+            <p className="text-[14px] font-bold leading-[1.2] text-[#c6923d]">STORIES & INSIGHTS</p>
+            <h2 className="mt-[13px] text-[34px] font-bold leading-[1.12] text-[#263129] sm:text-[clamp(34px,3.6vw,48px)]">
+              From East Africa, With Stories
+            </h2>
+            <p className="mt-[17px] max-w-[680px] text-[16px] font-semibold leading-[1.7] text-[#2f3f34] sm:text-[clamp(16px,1.4vw,18px)]">
               Discover travel inspiration, destination guides, wildlife stories, cultural insights, and useful
               advice for exploring East Africa.
             </p>
@@ -65,25 +67,39 @@ function Blog() {
               Loading blog posts...
             </div>
           ) : articles.length > 0 ? (
-            <div className="blog-grid">
+            <div className="mt-[42px] grid grid-cols-1 gap-x-[26px] gap-y-[31px] min-[861px]:grid-cols-3 sm:grid-cols-2">
               {articles.map((article) => {
                 const articlePath = `/blog/${article.slug || article.id}`
 
                 return (
-                  <article className="blog-card" key={article.id || article.slug || article.title}>
-                    <Link className="blog-card-image" to={articlePath} aria-label={article.title}>
-                      <img src={mediaPreviewUrl(article.cover_image_url) || akageraImage} alt="" />
+                  <article
+                    className="group flex min-w-0 flex-col overflow-hidden rounded-[7px] border border-[#0b2a12]/10 bg-white shadow-[0_16px_36px_rgba(11,42,18,0.08)] transition hover:-translate-y-1 hover:border-[#c6923d]/40 hover:shadow-[0_24px_48px_rgba(11,42,18,0.14)]"
+                    key={article.id || article.slug || article.title}
+                  >
+                    <Link className="block h-[214px] overflow-hidden bg-[#d7e3d8] min-[520px]:max-sm:h-[150px]" to={articlePath} aria-label={article.title}>
+                      <img
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.045]"
+                        src={mediaPreviewUrl(article.cover_image_url) || akageraImage}
+                        alt=""
+                      />
                     </Link>
-                  <div className="blog-card-body">
-                    <p className="blog-card-meta">{article.category || 'IMIGANI STORIES'}</p>
-                    <h3>
-                      <Link to={articlePath}>{article.title}</Link>
+                  <div className="flex min-h-0 flex-1 flex-col p-4 sm:min-h-[314px] sm:p-[25px_24px_23px]">
+                    <p className="text-[11px] font-bold leading-[1.35] text-[#c6923d]">{article.category || 'IMIGANI STORIES'}</p>
+                    <h3 className="mt-3 text-[20px] font-bold leading-[1.22] text-[#102f16] min-[520px]:max-sm:text-[15px] sm:text-[clamp(20px,1.7vw,24px)]">
+                      <Link className="text-inherit transition hover:text-[#c6923d]" to={articlePath}>
+                        {article.title}
+                      </Link>
                     </h3>
-                    <p className="blog-card-excerpt">{plainTextSummary(article.content, 140)}</p>
-                    <div className="blog-card-footer">
+                    <p className="mt-[15px] text-[14px] font-semibold leading-[1.62] text-[#455348] min-[520px]:max-sm:text-[12px]">
+                      {plainTextSummary(article.content, 140)}
+                    </p>
+                    <div className="mt-auto grid gap-[15px] pt-[22px] text-[12px] font-bold leading-[1.35] text-[#68736b]">
                       <span>{formatDate(article.published_at || article.created_at)}</span>
-                      <Link className="blog-read-link" to={articlePath}>
-                        Read Story <ArrowRight className="icon-link" aria-hidden="true" />
+                      <Link
+                        className="inline-flex w-fit items-center gap-[7px] text-[13px] font-bold text-[#855113] transition hover:translate-x-[3px] hover:text-[#0b2a12]"
+                        to={articlePath}
+                      >
+                        Read Story <ArrowRight className="h-[14px] w-[14px] flex-none stroke-[2.4]" aria-hidden="true" />
                       </Link>
                     </div>
                   </div>

@@ -35,6 +35,10 @@ import serengetiImage from '../assets/Destinations/Tanzania/Serengeti National P
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
 
 const fallbackGallery = [gorillaImage, volcanoImage, kigaliImage, nyungweImage]
+const tourPanelClass =
+  'scroll-mt-[90px] rounded-[8px] border border-[#0b2a12]/11 bg-white p-[22px] shadow-[0_16px_36px_rgba(11,42,18,0.07)] sm:p-7'
+const richTextClass =
+  'text-[13px] font-bold leading-[1.75] text-[#455349] [&_li::marker]:text-[#c6923d] [&_ol]:grid [&_ol]:gap-[9px] [&_ol]:pl-[18px] [&_p+_p]:mt-2.5 [&_p+_ul]:mt-2.5 [&_ul+_p]:mt-2.5 [&_ul]:grid [&_ul]:gap-[9px] [&_ul]:pl-[18px]'
 
 const sampleTour = {
   badges: ['Private guide', 'Permit support', 'Kigali transfers'],
@@ -159,47 +163,56 @@ function TourDetail() {
   const routeMapExternalUrl = `https://www.google.com/maps/search/?api=1&query=${encodedRouteMapQuery}`
 
   return (
-    <section className="tour-detail-page">
-      <div className="tour-detail-shell">
-        <nav className="tour-detail-breadcrumb" aria-label="Breadcrumb">
-          <Link to="/">Home</Link>
-          <ChevronRight aria-hidden="true" />
-          <Link to="/tours">Tours & Safaris</Link>
-          <ChevronRight aria-hidden="true" />
+    <section className="bg-[linear-gradient(180deg,#f7faf5_0,#ffffff_360px),#ffffff] px-4 pb-16 pt-[26px] sm:px-5 sm:pb-[82px] sm:pt-[34px]">
+      <div className="mx-auto w-full max-w-[1120px]">
+        <nav className="flex flex-wrap items-center gap-[7px] text-[12px] font-bold leading-[1.4] text-[#68756c]" aria-label="Breadcrumb">
+          <Link className="text-[#0b2a12] transition hover:text-[#c6923d]" to="/">
+            Home
+          </Link>
+          <ChevronRight className="h-[13px] w-[13px] text-[#0b2a12]/38 stroke-[2.5]" aria-hidden="true" />
+          <Link className="text-[#0b2a12] transition hover:text-[#c6923d]" to="/tours">
+            Tours & Safaris
+          </Link>
+          <ChevronRight className="h-[13px] w-[13px] text-[#0b2a12]/38 stroke-[2.5]" aria-hidden="true" />
           <span>{tour.category || 'Wildlife Safaris'}</span>
-          <ChevronRight aria-hidden="true" />
-          <strong>{tour.title}</strong>
+          <ChevronRight className="h-[13px] w-[13px] text-[#0b2a12]/38 stroke-[2.5]" aria-hidden="true" />
+          <strong className="text-[#2f3f34]">{tour.title}</strong>
         </nav>
 
         {isLoading ? (
-          <div className="tour-detail-loading" role="status">
-            <span />
+          <div
+            className="mt-[18px] inline-flex items-center gap-2.5 rounded-[7px] border border-[#c6923d]/24 bg-[#fffaf0]/90 px-[14px] py-3 text-[12px] font-bold leading-[1.5] text-[#6b4b20]"
+            role="status"
+          >
+            <span className="h-[14px] w-[14px] animate-[tourSpin_780ms_linear_infinite] rounded-full border-2 border-[#c6923d]/30 border-t-[#c6923d]" />
             Preparing your safari details...
           </div>
         ) : null}
 
-        <header className="tour-detail-heading">
+        <header className="mt-7 flex items-end justify-between gap-6">
           <div>
-            <p className="tour-detail-kicker">{tour.category || 'Wildlife Safaris'}</p>
-            <h1>{tour.title}</h1>
-            <div className="tour-detail-rating">
-              <span aria-label={`${tour.rating} out of 5 stars`}>
+            <p className="text-[12px] font-bold uppercase leading-[1.2] text-[#855113]">{tour.category || 'Wildlife Safaris'}</p>
+            <h1 className="mt-2.5 max-w-[800px] text-[34px] font-bold leading-[1.08] text-[#0b2a12] sm:text-[clamp(34px,5vw,58px)]">
+              {tour.title}
+            </h1>
+            <div className="mt-[17px] flex flex-wrap items-center gap-x-4 gap-y-3 text-[13px] font-bold leading-[1.4] text-[#56635b]">
+              <span className="inline-flex gap-[3px] text-[#d3a14e]" aria-label={`${tour.rating} out of 5 stars`}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} aria-hidden="true" />
+                  <Star className="h-[15px] w-[15px] fill-current stroke-[1.8]" key={star} aria-hidden="true" />
                 ))}
               </span>
               <strong>
                 {tour.rating} ({tour.reviewCount})
               </strong>
-              <em>
-                <MapPin aria-hidden="true" />
+              <em className="inline-flex items-center gap-1.5 text-[#314238] not-italic">
+                <MapPin className="h-[15px] w-[15px] text-[#855113] stroke-[1.8]" aria-hidden="true" />
                 {tour.destination}
               </em>
             </div>
           </div>
         </header>
 
-        <div className="tour-detail-top">
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_318px]">
           <div className="grid min-w-0 gap-3">
             <Gallery gallery={gallery} title={tour.title} />
             <BookingSummary tour={tour} />
@@ -207,72 +220,95 @@ function TourDetail() {
           <BookingCard tour={tour} />
         </div>
 
-        <nav className="tour-detail-tabs" aria-label="Tour detail sections">
+        <nav className="sticky top-0 z-[5] -mx-4 mt-7 grid grid-cols-2 gap-2 overflow-visible border-y border-[#0b2a12]/10 bg-white/95 p-2 shadow-[0_18px_38px_rgba(11,42,18,0.08)] sm:mx-0 sm:flex sm:overflow-x-auto sm:rounded-[8px] sm:border" aria-label="Tour detail sections">
           {['Overview', 'Itinerary', 'Inclusions', 'Exclusions', 'Extra Info', 'Map'].map((tab) => (
-            <a href={`#${tab.toLowerCase().replace(/\s+/g, '-')}`} key={tab}>
+            <a
+              className="inline-flex min-h-9 flex-none items-center justify-center rounded-[5px] px-[13px] text-[12px] font-bold text-[#3f4d43] transition hover:bg-[#d7e3d8]/70 hover:text-[#0b2a12]"
+              href={`#${tab.toLowerCase().replace(/\s+/g, '-')}`}
+              key={tab}
+            >
               {tab}
             </a>
           ))}
         </nav>
 
-        <div className="tour-detail-content">
-          <main>
-            <section className="tour-detail-section" id="overview">
+        <div className="mt-[34px] grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_318px]">
+          <main className="grid gap-6">
+            <section className={tourPanelClass} id="overview">
               <SectionIntro icon={Compass} label="Overview" title="A carefully paced encounter with Rwanda's wild heart" />
-              <p className="tour-detail-description">{plainText(tour.description, 900)}</p>
-              <div className="tour-highlight-grid">
+              <p className="mt-[18px] text-[15px] font-bold leading-[1.82] text-[#405046]">{plainText(tour.description, 900)}</p>
+              <div className="mt-5 flex flex-wrap gap-2.5">
                 {tour.highlights.map((highlight, index) => (
-                  <article key={`${typeof highlight === 'string' ? highlight : highlight.title}-${index}`}>
-                    <p>{typeof highlight === 'string' ? highlight : highlight.title}</p>
+                  <article
+                    className="inline-flex max-w-full items-center rounded-[5px] border border-[#c6923d]/24 bg-[#fffaf0] px-[11px] py-[9px]"
+                    key={`${typeof highlight === 'string' ? highlight : highlight.title}-${index}`}
+                  >
+                    <p className="m-0 break-words text-[12px] font-bold leading-[1.35] text-[#5f421a]">
+                      {typeof highlight === 'string' ? highlight : highlight.title}
+                    </p>
                   </article>
                 ))}
               </div>
             </section>
 
-            <section className="tour-detail-section" id="itinerary">
-              <h2 className="tour-itinerary-title">Itinerary</h2>
-              <div className="tour-itinerary-timeline">
+            <section className={tourPanelClass} id="itinerary">
+              <h2 className="m-0 text-[clamp(26px,3vw,34px)] font-bold leading-[1.16] text-[#0b2a12]">Itinerary</h2>
+              <div className="relative mt-[18px] grid overflow-hidden bg-white before:absolute before:bottom-[calc(18px+11px+4.5px)] before:left-[3.5px] before:top-[calc(18px+11px+4.5px)] before:z-0 before:w-0.5 before:bg-[#0b2a12]/28 sm:before:bottom-[calc(22px+11px+4.5px)] sm:before:top-[calc(22px+11px+4.5px)]">
                 {tour.itinerary.map((day, index) => (
-                  <article className="tour-itinerary-card" key={`${day.day_number}-${day.title}`}>
-                    <span className="tour-itinerary-dot" aria-hidden="true" />
-                    <span className="tour-itinerary-day">Day {day.day_number || index + 1}</span>
-                    <div className="tour-itinerary-copy">
-                      <h3>{day.title || `Day ${index + 1}`}</h3>
+                  <article
+                    className="relative z-[1] grid grid-cols-[9px_minmax(0,1fr)_20px] gap-x-[13px] gap-y-2.5 py-[18px] before:absolute before:left-[22px] before:right-0 before:top-0 before:h-px before:bg-[#0b2a12]/12 first:before:hidden sm:grid-cols-[9px_auto_minmax(0,1fr)_24px] sm:gap-[18px] sm:py-[22px_0_24px]"
+                    key={`${day.day_number}-${day.title}`}
+                  >
+                    <span className="relative z-[2] col-start-1 row-start-1 mt-[11px] block h-[9px] w-[9px] rounded-full bg-[#0b2a12] shadow-[0_0_0_4px_#fff]" aria-hidden="true" />
+                    <span className="col-start-2 row-start-1 inline-flex min-h-[30px] w-fit min-w-[70px] items-center justify-center rounded-[3px] bg-[#0b2a12] px-[13px] py-2 text-[12px] font-bold leading-[1.2] text-white sm:min-w-[72px]">
+                      Day {day.day_number || index + 1}
+                    </span>
+                    <div className="col-start-2 col-end-[-1] row-start-2 min-w-0 sm:col-start-3 sm:col-end-4 sm:row-start-1">
+                      <h3 className="text-[19px] font-bold leading-[1.28] text-[#0b2a12]">{day.title || `Day ${index + 1}`}</h3>
                       <div
-                        className="tour-rich-text"
+                        className={`${richTextClass} mt-[7px]`}
                         dangerouslySetInnerHTML={{ __html: richTextOrParagraph(day.description) }}
                       />
                     </div>
-                    <ChevronDown className="tour-itinerary-chevron" aria-hidden="true" />
+                    <ChevronDown className="col-start-3 row-start-1 mt-1.5 h-[19px] w-[19px] justify-self-end text-[#0b2a12]/58 stroke-[2.3] sm:col-start-4" aria-hidden="true" />
                   </article>
                 ))}
               </div>
             </section>
 
-            <section className="tour-info-strip" id="extra-info">
-              <SectionIntro icon={Info} label="Extra Information" title="Useful details before you travel" />
-              <div className="tour-rich-text" dangerouslySetInnerHTML={{ __html: richTextOrParagraph(tour.extras) }} />
+            <section
+              className={`${tourPanelClass} bg-[linear-gradient(135deg,rgba(11,42,18,0.96),rgba(20,56,27,0.93)),#0b2a12] text-white`}
+              id="extra-info"
+            >
+              <SectionIntro icon={Info} label="Extra Information" title="Useful details before you travel" light />
+              <div className={`${richTextClass} mt-[18px] text-white/90`} dangerouslySetInnerHTML={{ __html: richTextOrParagraph(tour.extras) }} />
             </section>
 
-            <section className="tour-map-panel" id="map">
+            <section className={`${tourPanelClass} grid gap-[18px]`} id="map">
               <SectionIntro icon={Map} label="Route Map" title={routeMapQuery} />
-              <div className="tour-map-frame">
+              <div className="relative min-h-[360px] overflow-hidden rounded-[8px] border border-[#0b2a12]/12 bg-[#d7e3d8]">
                 <iframe
+                  className="absolute inset-0 h-full w-full border-0"
                   title={`${routeMapQuery} map`}
                   src={routeMapEmbedUrl}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allowFullScreen
                 />
-                <a className="tour-map-open-link" href={routeMapExternalUrl} target="_blank" rel="noreferrer">
-                  <MapPin aria-hidden="true" />
+                <a
+                  className="absolute bottom-3.5 right-3.5 z-[2] inline-flex min-h-[38px] items-center justify-center gap-[7px] rounded-[5px] border border-white/30 bg-[#0b2a12] px-[13px] text-[12px] font-bold leading-[1.2] text-white shadow-[0_12px_22px_rgba(11,42,18,0.2)] transition hover:-translate-y-px hover:bg-[#c6923d]"
+                  href={routeMapExternalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <MapPin className="h-[15px] w-[15px] flex-none stroke-[2.3]" aria-hidden="true" />
                   Open in Google Maps
                 </a>
               </div>
             </section>
           </main>
 
-          <aside className="tour-side-panels">
+          <aside className="relative top-auto grid grid-cols-1 gap-6 sm:grid-cols-2 lg:sticky lg:top-[72px] lg:grid-cols-1">
             <RichPanel id="inclusions" icon={Check} title="Included" content={tour.inclusions} />
             <RichPanel id="exclusions" icon={X} title="Excluded" content={tour.exclusions} />
           </aside>
@@ -280,19 +316,26 @@ function TourDetail() {
 
         
 
-        <section className="tour-related">
-          <div className="tour-related-head">
+        <section className="mt-[34px]">
+          <div className="flex flex-col items-start justify-between gap-[18px] sm:flex-row sm:items-end">
             <SectionIntro icon={Sparkles} label="You May Also Like" title="More journeys with the same spirit" />
-            <Link to="/tours">
-              View all tours <ArrowRight aria-hidden="true" />
+            <Link
+              className="inline-flex flex-none items-center gap-[7px] text-[13px] font-bold text-[#855113] transition hover:translate-x-[3px] hover:text-[#0b2a12]"
+              to="/tours"
+            >
+              View all tours <ArrowRight className="h-[15px] w-[15px]" aria-hidden="true" />
             </Link>
           </div>
-          <div className="tour-related-row">
+          <div className="mt-5 grid grid-cols-1 gap-4 min-[861px]:grid-cols-4 sm:grid-cols-2">
             {relatedTours.map((item) => (
-              <Link className="tour-related-card" to={item.path || `/tours/${slugify(item.title)}`} key={item.title}>
-                <img src={item.image} alt="" />
-                <span>{item.meta}</span>
-                <strong>{item.title}</strong>
+              <Link
+                className="group relative block min-h-[210px] overflow-hidden rounded-[8px] bg-[#d7e3d8] text-white shadow-[0_16px_34px_rgba(11,42,18,0.12)] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,rgba(7,24,11,0.12),rgba(7,24,11,0.76))]"
+                to={item.path || `/tours/${slugify(item.title)}`}
+                key={item.title}
+              >
+                <img className="h-full min-h-[210px] w-full object-cover transition duration-500 group-hover:scale-[1.045]" src={item.image} alt="" />
+                <span className="absolute bottom-[58px] left-4 right-4 z-[1] text-[11px] font-bold uppercase text-[#d3a14e]">{item.meta}</span>
+                <strong className="absolute bottom-[18px] left-4 right-4 z-[1] text-[17px] font-bold leading-[1.25]">{item.title}</strong>
               </Link>
             ))}
           </div>
@@ -310,18 +353,27 @@ function Gallery({ gallery, title }) {
   const thumbs = [gallery[1] || gallery[0], gallery[2] || gallery[0], gallery[3] || gallery[0]]
 
   return (
-    <section className="tour-gallery" aria-label={`${title} photos`}>
-      <button className="tour-gallery-cover" type="button" onClick={() => setLightboxOpen(true)}>
-        <img src={activeImage} alt={title} />
-        <span>
-          <Camera aria-hidden="true" />
+    <section
+      className="grid min-h-0 grid-cols-1 gap-3 min-[861px]:min-h-[468px] min-[861px]:grid-cols-[minmax(0,1fr)_176px]"
+      aria-label={`${title} photos`}
+    >
+      <button
+        className="relative cursor-pointer overflow-hidden rounded-[8px] border-0 bg-[#d7e3d8] shadow-[0_18px_42px_rgba(11,42,18,0.12)]"
+        type="button"
+        onClick={() => setLightboxOpen(true)}
+      >
+        <img className="h-full min-h-[300px] w-full object-cover sm:min-h-[360px] min-[861px]:min-h-[468px]" src={activeImage} alt={title} />
+        <span className="absolute bottom-[18px] right-[18px] inline-flex items-center gap-2 rounded-[5px] bg-white/95 px-3 py-2.5 text-[12px] font-bold leading-none text-[#0b2a12] shadow-[0_12px_24px_rgba(7,24,11,0.18)]">
+          <Camera className="h-4 w-4 text-[#855113] stroke-[2.2]" aria-hidden="true" />
           Open Gallery
         </span>
       </button>
-      <div className="tour-gallery-thumbs">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 min-[861px]:grid-cols-1">
         {thumbs.map((image, index) => (
           <button
-            className={`tour-gallery-thumb ${activeImage === image ? 'is-active' : ''}`}
+            className={`relative min-h-[150px] cursor-pointer overflow-hidden rounded-[8px] border-0 bg-[#d7e3d8] shadow-[0_10px_24px_rgba(11,42,18,0.09)] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,transparent,rgba(7,24,11,0.42))] after:opacity-0 after:transition hover:after:opacity-100 sm:min-h-[126px] min-[861px]:min-h-[148px] ${
+              activeImage === image ? 'outline outline-[3px] outline-offset-[-3px] outline-[#d3a14e]' : ''
+            }`}
             type="button"
             key={`${image}-${index}`}
             onClick={() => {
@@ -331,10 +383,10 @@ function Gallery({ gallery, title }) {
               }
             }}
           >
-            <img src={image} alt="" />
+            <img className="h-full w-full object-cover" src={image} alt="" />
             {index === 2 ? (
-              <span>
-                <Camera aria-hidden="true" />
+              <span className="absolute inset-auto bottom-3 left-3 right-3 z-[1] inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-white/92 px-2.5 py-2 text-[11px] font-bold leading-[1.15] text-[#0b2a12]">
+                <Camera className="h-3.5 w-3.5 text-[#855113] stroke-[2.2]" aria-hidden="true" />
                 View All Photos
               </span>
             ) : null}
@@ -342,21 +394,33 @@ function Gallery({ gallery, title }) {
         ))}
       </div>
       {isLightboxOpen ? (
-        <div className="tour-lightbox" role="dialog" aria-modal="true" aria-label={`${title} photo gallery`}>
-          <button className="tour-lightbox-close" type="button" aria-label="Close gallery" onClick={() => setLightboxOpen(false)}>
-            <X aria-hidden="true" />
+        <div
+          className="fixed inset-0 z-[80] grid place-items-center gap-[18px] bg-[#07180b]/90 px-5 py-[30px]"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${title} photo gallery`}
+        >
+          <button
+            className="absolute right-[18px] top-[18px] inline-flex h-[42px] w-[42px] items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+            type="button"
+            aria-label="Close gallery"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <X className="h-[22px] w-[22px] stroke-[2.5]" aria-hidden="true" />
           </button>
-          <img src={activeImage} alt={title} />
-          <div className="tour-lightbox-strip">
+          <img className="max-h-[72vh] w-[min(980px,100%)] rounded-[8px] object-contain shadow-[0_28px_70px_rgba(0,0,0,0.34)]" src={activeImage} alt={title} />
+          <div className="flex max-w-[min(980px,100%)] gap-2.5 overflow-x-auto pb-1">
             {gallery.map((image, index) => (
               <button
-                className={index === safeActiveIndex ? 'is-active' : ''}
+                className={`h-[68px] w-24 flex-none overflow-hidden rounded-md border-2 bg-[#d7e3d8] ${
+                  index === safeActiveIndex ? 'border-[#d3a14e]' : 'border-transparent'
+                }`}
                 type="button"
                 key={`${image}-lightbox-${index}`}
                 aria-label={`Show photo ${index + 1}`}
                 onClick={() => setActiveIndex(index)}
               >
-                <img src={image} alt="" />
+                <img className="h-full w-full object-cover" src={image} alt="" />
               </button>
             ))}
           </div>
@@ -579,26 +643,32 @@ function getTourFacts(tour) {
   ]
 }
 
-function SectionIntro({ icon: Icon, label, title }) {
+function SectionIntro({ icon: Icon, label, title, light = false }) {
   return (
-    <div className="tour-section-intro">
-      <span>
-        <Icon aria-hidden="true" />
+    <div>
+      <span className="inline-flex items-center gap-[7px] text-[11px] font-bold uppercase leading-[1.2] text-[#c6923d]">
+        <Icon className="h-[15px] w-[15px] stroke-[2.3]" aria-hidden="true" />
         {label}
       </span>
-      <h2>{title}</h2>
+      <h2
+        className={`mt-2 max-w-[700px] text-[clamp(24px,3vw,34px)] font-bold leading-[1.18] ${
+          light ? 'text-white' : 'text-[#0b2a12]'
+        }`}
+      >
+        {title}
+      </h2>
     </div>
   )
 }
 
 function RichPanel({ id, icon: Icon, title, content }) {
   return (
-    <section className="tour-rich-panel" id={id}>
-      <h2>
-        <Icon aria-hidden="true" />
+    <section className="scroll-mt-[90px] rounded-[8px] border border-[#0b2a12]/11 bg-white px-[22px] py-[23px] shadow-[0_16px_36px_rgba(11,42,18,0.07)]" id={id}>
+      <h2 className="inline-flex items-center gap-2 text-[20px] font-bold leading-[1.25] text-[#0b2a12]">
+        <Icon className="h-[18px] w-[18px] text-[#c6923d] stroke-[2.5]" aria-hidden="true" />
         {title}
       </h2>
-      <div className="tour-rich-text" dangerouslySetInnerHTML={{ __html: richTextOrParagraph(content) }} />
+      <div className={`${richTextClass} mt-4`} dangerouslySetInnerHTML={{ __html: richTextOrParagraph(content) }} />
     </section>
   )
 }

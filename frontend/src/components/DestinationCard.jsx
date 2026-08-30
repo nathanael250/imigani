@@ -33,7 +33,7 @@ function DestinationCard({ destination }) {
           </p>
         )}
         <Link className={linkClass} to={destination.to}>
-          {destination.link} <ArrowRight className="ml-2 icon-link" aria-hidden="true" />
+          {destination.link} <ArrowRight className="ml-2 h-[15px] w-[15px]" aria-hidden="true" />
         </Link>
       </div>
     </article>

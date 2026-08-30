@@ -10,7 +10,7 @@ import {
   Sparkles,
   UsersRound,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import DestinationCard from '../components/DestinationCard.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
@@ -133,7 +133,6 @@ const destinations = [
 ]
 
 function Home() {
-  const revealRootRef = useHomeReveal()
   const visibleExperienceCount = 4
   const [experienceStart, setExperienceStart] = useState(0)
   const visibleExperiences = Array.from({ length: visibleExperienceCount }, (_, index) => {
@@ -149,18 +148,18 @@ function Home() {
   }
 
   return (
-    <div ref={revealRootRef} className="home-page">
+    <div>
       <section
         id="home"
-        className="hero-panel relative isolate flex min-h-[620px] items-center overflow-hidden px-5 py-20 text-white"
+        className="relative isolate flex min-h-[560px] items-center overflow-hidden bg-[#0b2a12] bg-[position:58%_center] px-5 py-16 text-white sm:min-h-[620px] sm:py-20"
       >
-        <div className="hero-slides" aria-hidden="true">
+        <div className="absolute inset-0 -z-10" aria-hidden="true">
           {heroSlides.map((image, index) => (
             <img
               key={image}
               src={image}
               alt=""
-              className="hero-slide"
+              className="absolute inset-0 h-full w-full object-cover opacity-0 animate-[heroFade_40s_infinite]"
               style={{ animationDelay: `${index * 8}s` }}
             />
           ))}
@@ -168,20 +167,26 @@ function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,11,0.82),rgba(8,27,12,0.58)_48%,rgba(8,27,12,0.28))]" />
         <div className="relative mx-auto w-full max-w-[1120px]">
           <div className="max-w-[690px]">
-            <h1 className="home-reveal text-[42px] font-bold leading-[1.18] text-white sm:text-[54px]">
+            <h1 className="text-[34px] font-bold leading-[1.18] text-white sm:text-[54px]">
               Muraho Neza!
               <span className="mt-1 block">Welcome to IMIGANI.</span>
             </h1>
-            <p className="home-reveal mt-7 max-w-[690px] whitespace-pre-line text-[18px] font-medium leading-[1.85] text-white/92" style={{ '--reveal-delay': '120ms' }}>
+            <p className="mt-7 max-w-[690px] whitespace-pre-line text-[14px] font-medium leading-[1.72] text-white/92 sm:text-[18px] sm:leading-[1.85]">
               {`IMIGANI Safaris and Tours is a boutique East African travel company rooted in Rwanda, creating authentic and meaningful journeys across Rwanda, Uganda, Kenya, and Tanzania.
 
 From wildlife and adventure to culture, education, and leisure, we thoughtfully design experiences that connect travelers with the people, places, nature, and stories that make East Africa unforgettable.`}
             </p>
-            <div className="home-reveal mt-9 flex flex-wrap gap-4" style={{ '--reveal-delay': '240ms' }}>
-              <a className="hero-button hero-button-gold" href="#experiences">
+            <div className="mt-9 flex flex-wrap gap-4">
+              <a
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-[5px] bg-[#c6923d] px-6 text-center text-[14px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a96e19] sm:w-auto"
+                href="#experiences"
+              >
                 Explore our Experience
               </a>
-              <Link className="hero-button hero-button-light" to="/destinations">
+              <Link
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-[5px] border border-white/45 bg-white/12 px-6 text-center text-[14px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#0b2a12] sm:w-auto"
+                to="/destinations"
+              >
                 Discover our Destinations
               </Link>
             </div>
@@ -189,24 +194,28 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
         </div>
         <div className="absolute inset-x-0 bottom-8 flex justify-center gap-2.5" aria-label="Hero slider dots">
           {heroSlides.map((image, index) => (
-            <span key={image} className="hero-dot" style={{ animationDelay: `${index * 8}s` }} />
+            <span
+              key={image}
+              className="h-[9px] w-[9px] rounded-full bg-white/42 animate-[heroDot_40s_infinite]"
+              style={{ animationDelay: `${index * 8}s` }}
+            />
           ))}
         </div>
       </section>
 
       <section id="about-us" className="bg-white px-5 py-[78px]">
         <div className="mx-auto max-w-[1120px]">
-          <div className="home-reveal">
+          <div>
             <SectionHeading title="Why IMIGANI?" />
           </div>
-          <div className="why-grid mt-[52px] grid gap-9 sm:grid-cols-2 lg:grid-cols-4">
-            {whyItems.map((item, index) => (
-              <article key={item.title} className="home-reveal text-center" style={{ '--reveal-delay': `${index * 90}ms` }}>
-                <div className="mx-auto flex h-[76px] w-[76px] items-center justify-center rounded-full bg-[#d7e3d8] text-[30px] font-bold text-[#15351a]">
-                  <item.Icon className="icon-value" aria-hidden="true" />
+          <div className="mt-[52px] grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-9 lg:grid-cols-4">
+            {whyItems.map((item) => (
+              <article key={item.title} className="text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#d7e3d8] text-[#15351a] sm:h-[76px] sm:w-[76px]">
+                  <item.Icon className="h-7 w-7 sm:h-9 sm:w-9" aria-hidden="true" />
                 </div>
-                <h3 className="mt-6 text-[18px] font-bold leading-snug text-[#19381d]">{item.title}</h3>
-                <p className="mx-auto mt-3 max-w-[260px] text-[15px] font-medium leading-[1.75] text-[#637069]">
+                <h3 className="mt-4 text-[14px] font-bold leading-snug text-[#19381d] sm:mt-6 sm:text-[18px]">{item.title}</h3>
+                <p className="mx-auto mt-3 max-w-[240px] text-[12px] font-medium leading-[1.55] text-[#637069] sm:max-w-[260px] sm:text-[15px] sm:leading-[1.75]">
                   {item.text}
                 </p>
               </article>
@@ -217,40 +226,53 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
 
       <section id="experiences" className="bg-[#102f16] px-5 py-[78px] text-white">
         <div className="mx-auto max-w-[1120px]">
-          <div className="home-reveal">
+          <div>
             <SectionHeading title="Experiences" light />
           </div>
-          <div className="home-reveal mx-auto mt-7 max-w-[760px] text-center" style={{ '--reveal-delay': '100ms' }}>
+          <div className="mx-auto mt-7 max-w-[760px] text-center">
             <h2 className="text-[30px] font-bold leading-tight text-white sm:text-[40px]">Travel With Meaning</h2>
-            <p className="mx-auto mt-5 max-w-[820px] text-[17px] font-medium leading-[1.8] text-white/78">
+            <p className="mx-auto mt-5 max-w-[820px] text-[14px] font-medium leading-[1.65] text-white/78 sm:text-[17px] sm:leading-[1.8]">
               Whether you are seeking adventure, wildlife, culture, learning, or simply time to reconnect,
               we create journeys around how you want to experience East Africa.
             </p>
           </div>
 
-          <div className="home-reveal mt-12 grid items-center gap-5 lg:grid-cols-[44px_1fr_44px]" style={{ '--reveal-delay': '180ms' }}>
-            <button className="carousel-button" type="button" aria-label="Previous experience" onClick={showPreviousExperiences}>
-              <ArrowLeft className="icon-arrow" aria-hidden="true" />
+          <div className="mt-12 grid items-center gap-5 lg:grid-cols-[44px_1fr_44px]">
+            <button
+              className="hidden h-11 w-11 items-center justify-center rounded-full border border-white/18 bg-white/8 text-white transition hover:-translate-y-0.5 hover:bg-[#d3a14e] lg:inline-flex"
+              type="button"
+              aria-label="Previous experience"
+              onClick={showPreviousExperiences}
+            >
+              <ArrowLeft className="h-[18px] w-[18px]" aria-hidden="true" />
             </button>
-            <div className="experience-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
               {visibleExperiences.map((experience) => (
-                <article key={experience.title} className="experience-card">
-                  <img src={experience.image} alt="" className="h-[168px] w-full object-cover" />
-                  <div className="min-h-[190px] bg-[#14381b] p-5">
-                    <h3 className="flex items-center gap-2 text-[18px] font-bold leading-snug text-white">
-                      <experience.Icon className="icon-card" aria-hidden="true" />
+                <article
+                  key={experience.title}
+                  className="overflow-hidden rounded-[8px] bg-[#14381b] shadow-[0_22px_42px_rgba(0,0,0,0.16)] transition hover:-translate-y-1 hover:shadow-[0_30px_54px_rgba(0,0,0,0.24)]"
+                >
+                  <img src={experience.image} alt="" className="h-[118px] w-full object-cover transition duration-500 hover:scale-[1.045] sm:h-[168px]" />
+                  <div className="min-h-[180px] bg-[#14381b] p-4 sm:min-h-[190px] sm:p-5">
+                    <h3 className="flex items-center gap-2 text-[14px] font-bold leading-snug text-white sm:text-[18px]">
+                      <experience.Icon className="h-[18px] w-[18px] flex-none text-[#d3a14e] sm:h-5 sm:w-5" aria-hidden="true" />
                       {experience.title}
                     </h3>
-                    <p className="mt-3 text-[14px] font-medium leading-[1.7] text-white/72">{experience.text}</p>
-                    <a className="mt-4 inline-flex text-[14px] font-bold text-[#d3a14e]" href="#">
-                      Learn More <ArrowRight className="ml-1 icon-link" aria-hidden="true" />
+                    <p className="mt-3 text-[12px] font-medium leading-[1.55] text-white/72 sm:text-[14px] sm:leading-[1.7]">{experience.text}</p>
+                    <a className="mt-4 inline-flex items-center text-[13px] font-bold text-[#d3a14e] sm:text-[14px]" href="#">
+                      Learn More <ArrowRight className="ml-1 h-[15px] w-[15px]" aria-hidden="true" />
                     </a>
                   </div>
                 </article>
               ))}
             </div>
-            <button className="carousel-button" type="button" aria-label="Next experience" onClick={showNextExperiences}>
-              <ArrowRight className="icon-arrow" aria-hidden="true" />
+            <button
+              className="hidden h-11 w-11 items-center justify-center rounded-full border border-white/18 bg-white/8 text-white transition hover:-translate-y-0.5 hover:bg-[#d3a14e] lg:inline-flex"
+              type="button"
+              aria-label="Next experience"
+              onClick={showNextExperiences}
+            >
+              <ArrowRight className="h-[18px] w-[18px]" aria-hidden="true" />
             </button>
           </div>
           <div className="mt-10 flex justify-center gap-2.5" aria-label="Experience carousel slides">
@@ -258,7 +280,9 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
               <button
                 key={experience.title}
                 type="button"
-                className={`experience-dot ${index === experienceStart ? 'experience-dot-active' : ''}`}
+                className={`h-[9px] w-[9px] rounded-full transition hover:scale-110 ${
+                  index === experienceStart ? 'bg-[#d3a14e]' : 'bg-white/34'
+                }`}
                 aria-label={`Show ${experience.title}`}
                 onClick={() => setExperienceStart(index)}
               />
@@ -269,7 +293,7 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
 
       <section id="destinations" className="scroll-mt-6 bg-white px-5 py-16 sm:py-20 lg:py-[106px]">
         <div className="mx-auto max-w-[1120px]">
-          <div className="home-reveal text-center">
+          <div className="text-center">
             <h2 className="text-[38px] font-bold leading-[1.05] text-[#050505] sm:text-[48px] lg:text-[62px]">
               Destinations
             </h2>
@@ -277,7 +301,7 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
           </div>
 
           <div className="mt-9 grid gap-5 sm:mt-11 lg:mt-14 lg:grid-cols-[minmax(0,0.47fr)_minmax(0,0.53fr)] lg:items-stretch">
-            <div className="home-reveal grid gap-5" style={{ '--reveal-delay': '100ms' }}>
+            <div className="grid gap-5">
               <div className="text-center text-[#0b0b0b] lg:mb-2 lg:text-left">
                 <h3 className="mx-auto max-w-[340px] text-[30px] font-bold leading-[1.16] sm:max-w-[500px] sm:text-[36px] lg:mx-0 lg:text-[43px]">
                   Discover East Africa
@@ -291,7 +315,7 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
               <DestinationCard destination={destinations[0]} />
             </div>
 
-            <div className="home-reveal grid gap-5 lg:grid-rows-[minmax(0,1fr)_183px]" style={{ '--reveal-delay': '220ms' }}>
+            <div className="grid gap-5 lg:grid-rows-[minmax(0,1fr)_183px]">
               <div className="grid gap-5 sm:grid-cols-2">
                 <DestinationCard destination={destinations[1]} />
                 <DestinationCard destination={destinations[2]} />
@@ -303,40 +327,6 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
       </section>
     </div>
   )
-}
-
-function useHomeReveal() {
-  const rootRef = useRef(null)
-
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root) return undefined
-
-    const items = Array.from(root.querySelectorAll('.home-reveal'))
-
-    if (!('IntersectionObserver' in window)) {
-      items.forEach((item) => item.classList.add('is-visible'))
-      return undefined
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      { rootMargin: '0px 0px -12% 0px', threshold: 0.16 },
-    )
-
-    items.forEach((item) => observer.observe(item))
-
-    return () => observer.disconnect()
-  }, [])
-
-  return rootRef
 }
 
 export default Home
