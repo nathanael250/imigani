@@ -2,7 +2,7 @@ import { ChevronDown, Globe2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from '../contexts/TranslationContext.jsx'
 
-function LanguageMenu({ className = '' }) {
+function LanguageMenu({ className = '', buttonClassName = '', listClassName = '' }) {
   const [isOpen, setIsOpen] = useState(false)
   const { language, languages, setLanguage } = useTranslation()
   const currentLanguage = languages[language] || 'English'
@@ -23,7 +23,7 @@ function LanguageMenu({ className = '' }) {
       }}
     >
       <button
-        className="language-menu-button"
+        className={`language-menu-button ${buttonClassName}`}
         type="button"
         aria-haspopup="menu"
         aria-expanded={isOpen}
@@ -35,7 +35,7 @@ function LanguageMenu({ className = '' }) {
       </button>
 
       {isOpen && (
-        <div className="language-menu-list" role="menu">
+        <div className={`language-menu-list ${listClassName}`} role="menu">
           {Object.entries(languages).map(([code, label]) => (
             <button
               className={code === language ? 'is-active' : ''}
