@@ -46,10 +46,10 @@ function getDestinationHeightClass(destination) {
   }
 
   if (destination.className === 'destination-tanzania') {
-    return 'min-h-[285px] sm:min-h-[310px] lg:h-[183px]'
+    return 'min-h-[285px] sm:min-h-[310px] lg:min-h-0 lg:h-full'
   }
 
-  return 'min-h-[285px] sm:min-h-[310px] lg:h-full'
+  return 'min-h-[285px] sm:min-h-[310px] lg:min-h-0 lg:h-full'
 }
 
 export default DestinationCard

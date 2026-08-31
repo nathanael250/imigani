@@ -291,7 +291,7 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
         </div>
       </section>
 
-      <section id="destinations" className="scroll-mt-6 bg-white px-5 py-16 sm:py-20 lg:py-[106px]">
+      <section id="destinations" className="relative z-[1] scroll-mt-6 bg-white px-5 py-16 sm:py-20 lg:pb-[78px] lg:pt-[106px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="text-center">
             <h2 className="text-[38px] font-bold leading-[1.05] text-[#050505] sm:text-[48px] lg:text-[62px]">
@@ -300,8 +300,8 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
             <span className="mx-auto mt-4 block h-[6px] w-[92px] rounded-[8px] bg-[#d3a14e]" />
           </div>
 
-          <div className="mt-9 grid gap-5 sm:mt-11 lg:mt-14 lg:grid-cols-[minmax(0,0.47fr)_minmax(0,0.53fr)] lg:items-stretch">
-            <div className="grid gap-5">
+          <div className="mt-9 grid gap-5 sm:mt-11 lg:mt-14 lg:grid-cols-[minmax(0,0.47fr)_minmax(0,0.53fr)] lg:items-start">
+            <div className="grid gap-5 lg:grid-rows-[auto_430px]">
               <div className="text-center text-[#0b0b0b] lg:mb-2 lg:text-left">
                 <h3 className="mx-auto max-w-[340px] text-[30px] font-bold leading-[1.16] sm:max-w-[500px] sm:text-[36px] lg:mx-0 lg:text-[43px]">
                   Discover East Africa
@@ -315,8 +315,8 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
               <DestinationCard destination={destinations[0]} />
             </div>
 
-            <div className="grid gap-5 lg:grid-rows-[minmax(0,1fr)_183px]">
-              <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 lg:grid-rows-[290px_320px]">
+              <div className="grid gap-5 sm:grid-cols-2 lg:min-h-0">
                 <DestinationCard destination={destinations[1]} />
                 <DestinationCard destination={destinations[2]} />
               </div>
