@@ -345,15 +345,15 @@ function Destinations() {
         role="tablist"
         aria-label="Destination countries"
       >
-        <div className="mx-auto grid max-w-[1120px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-[1120px] grid-cols-2 lg:grid-cols-4">
           {destinationTabs.map((destination, index) => (
             <button
               key={destination.id}
               type="button"
               role="tab"
-              className={`group relative flex min-h-[86px] cursor-pointer flex-col justify-center border-b border-white/12 px-2.5 py-3.5 text-center transition sm:min-h-[78px] sm:px-4 sm:py-4 lg:min-h-[92px] lg:border-b-0 lg:border-r lg:border-white/14 lg:px-[22px] lg:pb-[17px] lg:pt-[19px] ${
+              className={`group relative flex min-h-[82px] cursor-pointer flex-col justify-center border-b border-white/12 px-2.5 py-3.5 text-center transition sm:min-h-[78px] sm:px-4 sm:py-4 lg:min-h-[92px] lg:border-b-0 lg:border-r lg:border-white/14 lg:px-[22px] lg:pb-[17px] lg:pt-[19px] ${
                 index === 0 ? 'lg:border-l' : ''
-              } ${index % 2 === 0 ? 'sm:border-r' : 'sm:border-r-0'} ${
+              } ${index % 2 === 0 ? 'border-r border-white/12' : 'border-r-0'} ${
                 activeCountry === destination.id
                   ? 'bg-white/[0.045] text-[#d3a14e] after:absolute after:bottom-0 after:left-[22px] after:right-[22px] after:h-[3px] after:rounded-t-[6px] after:bg-[#d3a14e]'
                   : 'text-white/86 hover:bg-white/[0.045] hover:text-[#d3a14e]'

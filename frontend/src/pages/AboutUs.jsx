@@ -105,14 +105,14 @@ function AboutUs() {
       <section className="bg-white px-5 pb-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <SectionHeading title="Our Values" />
-          <div className="mt-[58px] grid gap-9 sm:grid-cols-2 lg:grid-cols-6">
+          <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-9 sm:mt-[58px] sm:gap-9 lg:grid-cols-6">
             {aboutValues.map((value) => (
               <article key={value.title} className="text-center">
-                <div className="mx-auto flex h-[62px] w-[62px] items-center justify-center rounded-full bg-[#a9c5b2] text-white">
-                  <value.Icon className="h-7 w-7" aria-hidden="true" />
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#a9c5b2] text-white sm:h-[62px] sm:w-[62px]">
+                  <value.Icon className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
                 </div>
-                <h3 className="mt-5 text-[17px] font-bold text-[#263129]">{value.title}</h3>
-                <p className="mx-auto mt-4 max-w-[170px] text-[13px] font-semibold leading-[1.45] text-[#263129]">
+                <h3 className="mt-4 text-[15px] font-bold text-[#263129] sm:mt-5 sm:text-[17px]">{value.title}</h3>
+                <p className="mx-auto mt-3 max-w-[150px] text-[12px] font-semibold leading-[1.45] text-[#263129] sm:mt-4 sm:max-w-[170px] sm:text-[13px]">
                   {value.text}
                 </p>
               </article>

@@ -257,11 +257,11 @@ function TourDetail() {
               <div className="relative mt-[18px] grid overflow-hidden bg-white before:absolute before:bottom-[calc(18px+11px+4.5px)] before:left-[3.5px] before:top-[calc(18px+11px+4.5px)] before:z-0 before:w-0.5 before:bg-[#0b2a12]/28 sm:before:bottom-[calc(22px+11px+4.5px)] sm:before:top-[calc(22px+11px+4.5px)]">
                 {tour.itinerary.map((day, index) => (
                   <article
-                    className="relative z-[1] grid grid-cols-[9px_minmax(0,1fr)_20px] gap-x-[13px] gap-y-2.5 py-[18px] before:absolute before:left-[22px] before:right-0 before:top-0 before:h-px before:bg-[#0b2a12]/12 first:before:hidden sm:grid-cols-[9px_auto_minmax(0,1fr)_24px] sm:gap-[18px] sm:py-[22px_0_24px]"
+                    className="relative z-[1] grid grid-cols-[9px_minmax(0,1fr)_20px] gap-x-[13px] gap-y-2.5 py-[18px] before:absolute before:left-[22px] before:right-0 before:top-0 before:h-px before:bg-[#0b2a12]/12 first:before:hidden sm:grid-cols-[9px_auto_minmax(0,1fr)_24px] sm:gap-x-[18px] sm:gap-y-0 sm:py-[22px]"
                     key={`${day.day_number}-${day.title}`}
                   >
                     <span className="relative z-[2] col-start-1 row-start-1 mt-[11px] block h-[9px] w-[9px] rounded-full bg-[#0b2a12] shadow-[0_0_0_4px_#fff]" aria-hidden="true" />
-                    <span className="col-start-2 row-start-1 inline-flex min-h-[30px] w-fit min-w-[70px] items-center justify-center rounded-[3px] bg-[#0b2a12] px-[13px] py-2 text-[12px] font-bold leading-[1.2] text-white sm:min-w-[72px]">
+                    <span className="col-start-2 row-start-1 inline-flex h-9 w-fit min-w-[64px] items-center justify-center self-start rounded-[4px] bg-[#0b2a12] px-3 text-[12px] font-bold leading-none text-white shadow-[0_2px_5px_rgba(11,42,18,0.24)]">
                       Day {day.day_number || index + 1}
                     </span>
                     <div className="col-start-2 col-end-[-1] row-start-2 min-w-0 sm:col-start-3 sm:col-end-4 sm:row-start-1">
@@ -278,11 +278,14 @@ function TourDetail() {
             </section>
 
             <section
-              className={`${tourPanelClass} bg-[linear-gradient(135deg,rgba(11,42,18,0.96),rgba(20,56,27,0.93)),#0b2a12] text-white`}
+              className="scroll-mt-[90px] rounded-[8px] border border-white/10 bg-[#0b2a12] p-[22px] text-white shadow-[0_18px_42px_rgba(11,42,18,0.16)] sm:p-7"
               id="extra-info"
             >
               <SectionIntro icon={Info} label="Extra Information" title="Useful details before you travel" light />
-              <div className={`${richTextClass} mt-[18px] text-white/90`} dangerouslySetInnerHTML={{ __html: richTextOrParagraph(tour.extras) }} />
+              <div
+                className={`${richTextClass} mt-[18px] text-white/90 [&_li]:text-white/90 [&_li::marker]:text-[#d3a14e] [&_p]:text-white/90`}
+                dangerouslySetInnerHTML={{ __html: richTextOrParagraph(tour.extras) }}
+              />
             </section>
 
             <section className={`${tourPanelClass} grid gap-[18px]`} id="map">
@@ -360,16 +363,16 @@ function Gallery({ gallery, title }) {
 
   return (
     <section
-      className="grid min-h-0 grid-cols-1 gap-3 min-[861px]:min-h-[468px] min-[861px]:grid-cols-[minmax(0,1fr)_176px]"
+      className="grid min-w-0 gap-3 overflow-hidden"
       aria-label={`${title} photos`}
     >
       <button
-        className="relative cursor-pointer overflow-hidden rounded-[8px] border-0 bg-[#d7e3d8] shadow-[0_18px_42px_rgba(11,42,18,0.12)]"
+        className="relative aspect-[4/3] min-h-[280px] w-full cursor-pointer overflow-hidden rounded-[8px] border-0 bg-[#d7e3d8] shadow-[0_18px_42px_rgba(11,42,18,0.12)] sm:aspect-[16/9] sm:min-h-[360px] lg:aspect-[16/10] lg:max-h-[468px]"
         type="button"
         onClick={() => setLightboxOpen(true)}
       >
         <SafeImage
-          className="h-full min-h-[300px] w-full object-cover sm:min-h-[360px] min-[861px]:min-h-[468px]"
+          className="h-full w-full object-cover"
           src={activeImage}
           alt={title}
           fallback={gorillaImage}
@@ -379,10 +382,10 @@ function Gallery({ gallery, title }) {
           Open Gallery
         </span>
       </button>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 min-[861px]:grid-cols-1">
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
         {thumbs.map((image, index) => (
           <button
-            className={`relative min-h-[150px] cursor-pointer overflow-hidden rounded-[8px] border-0 bg-[#d7e3d8] shadow-[0_10px_24px_rgba(11,42,18,0.09)] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,transparent,rgba(7,24,11,0.42))] after:opacity-0 after:transition hover:after:opacity-100 sm:min-h-[126px] min-[861px]:min-h-[148px] ${
+            className={`relative h-[72px] min-h-0 cursor-pointer overflow-hidden rounded-[8px] border-0 bg-[#d7e3d8] shadow-[0_10px_24px_rgba(11,42,18,0.09)] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,transparent,rgba(7,24,11,0.42))] after:opacity-0 after:transition hover:after:opacity-100 sm:h-[92px] lg:h-[84px] ${
               activeImage === image ? 'outline outline-[3px] outline-offset-[-3px] outline-[#d3a14e]' : ''
             }`}
             type="button"
@@ -396,9 +399,10 @@ function Gallery({ gallery, title }) {
           >
             <SafeImage className="h-full w-full object-cover" src={image} alt="" fallback={gorillaImage} />
             {index === 2 ? (
-              <span className="absolute inset-auto bottom-3 left-3 right-3 z-[1] inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-white/92 px-2.5 py-2 text-[11px] font-bold leading-[1.15] text-[#0b2a12]">
+              <span className="absolute inset-auto bottom-2 left-2 right-2 z-[1] inline-flex items-center justify-center gap-1 rounded-[5px] bg-white/92 px-2 py-1.5 text-[10px] font-bold leading-[1.1] text-[#0b2a12] sm:text-[11px]">
                 <Camera className="h-3.5 w-3.5 text-[#855113] stroke-[2.2]" aria-hidden="true" />
-                View All Photos
+                <span className="hidden sm:inline">View All Photos</span>
+                <span className="sm:hidden">All Photos</span>
               </span>
             ) : null}
           </button>
@@ -797,8 +801,13 @@ function getUploadBaseUrl() {
 
 function richTextOrParagraph(value) {
   const content = String(value || '').trim()
+  const visibleText = content
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 
-  if (!content) {
+  if (!visibleText) {
     return '<p>Details are confirmed during proposal planning.</p>'
   }
 
