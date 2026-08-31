@@ -4,6 +4,7 @@ import {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Clock3,
   Compass,
@@ -14,7 +15,6 @@ import {
   MapPin,
   Phone,
   Send,
-  Sparkles,
   Star,
   UserRound,
   Users,
@@ -91,27 +91,35 @@ const sampleTour = {
 
 const relatedTours = [
   {
+    category: 'Wildlife Safari',
+    duration: '5 Days / 4 Nights',
     image: akageraImage,
-    meta: 'Rwanda',
     path: '/tours/5-days-rwanda-highlights-tour',
+    price: '$1,680',
     title: '5 Days Rwanda Highlights Tour',
   },
   {
+    category: 'Wildlife Safari',
+    duration: '3 Days / 2 Nights',
     image: bwindiImage,
-    meta: 'Uganda',
     path: '/tours/3-days-gorilla-trekking-extension',
+    price: '$2,150',
     title: '3 Days Gorilla Trekking Extension',
   },
   {
+    category: 'Adventure',
+    duration: '4 Days / 3 Nights',
     image: lakeBunyonyiImage,
-    meta: 'Uganda',
     path: '/tours/4-days-lake-bunyonyi-escape',
+    price: '$620',
     title: '4 Days Lake Bunyonyi Escape',
   },
   {
+    category: 'Wildlife Safari',
+    duration: '8 Days / 7 Nights',
     image: serengetiImage,
-    meta: 'Tanzania',
     path: '/tours/8-days-great-migration-safari',
+    price: '$890',
     title: '8 Days Great Migration Safari',
   },
 ]
@@ -119,6 +127,7 @@ const relatedTours = [
 function TourDetail() {
   const { id } = useParams()
   const [apiTour, setApiTour] = useState(null)
+  const [relatedTourStart, setRelatedTourStart] = useState(0)
   const [status, setStatus] = useState(/^\d+$/.test(id || '') ? 'loading' : 'static')
 
   useEffect(() => {
@@ -156,6 +165,10 @@ function TourDetail() {
   }, [id])
 
   const tour = useMemo(() => (apiTour ? mapApiTour(apiTour) : sampleTour), [apiTour])
+  const visibleRelatedTours = useMemo(
+    () => relatedTours.map((_, index) => relatedTours[(relatedTourStart + index) % relatedTours.length]),
+    [relatedTourStart],
+  )
   const isLoading = status === 'loading'
   const gallery = tour.gallery.length > 0 ? tour.gallery : fallbackGallery
   const routeMapQuery = tour.destination || tour.title || 'Rwanda safari destination'
@@ -320,34 +333,65 @@ function TourDetail() {
 
         
 
-        <section className="mt-[34px]">
-          <div className="flex flex-col items-start justify-between gap-[18px] sm:flex-row sm:items-end">
-            <SectionIntro icon={Sparkles} label="You May Also Like" title="More journeys with the same spirit" />
+        <section className="relative mt-[42px] rounded-[8px] border border-[#0b2a12]/10 bg-white px-4 py-7 shadow-[0_16px_42px_rgba(11,42,18,0.07)] sm:px-7 sm:py-8">
+          <div className="flex items-center justify-between gap-5">
+            <h2 className="text-[25px] font-bold leading-tight text-[#0b2a12] sm:text-[29px]">You May Also Like</h2>
             <Link
-              className="inline-flex flex-none items-center gap-[7px] text-[13px] font-bold text-[#855113] transition hover:translate-x-[3px] hover:text-[#0b2a12]"
+              className="inline-flex flex-none items-center gap-[7px] text-[12px] font-bold text-[#855113] transition hover:translate-x-[3px] hover:text-[#0b2a12] sm:text-[13px]"
               to="/tours"
             >
               View all tours <ArrowRight className="h-[15px] w-[15px]" aria-hidden="true" />
             </Link>
           </div>
-          <div className="mt-5 grid grid-cols-1 gap-4 min-[861px]:grid-cols-4 sm:grid-cols-2">
-            {relatedTours.map((item) => (
+
+          <button
+            aria-label="Show previous tours"
+            className="absolute left-0 top-1/2 z-[2] hidden h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border border-[#0b2a12]/10 bg-white text-[#0b2a12] shadow-[0_8px_22px_rgba(11,42,18,0.12)] transition hover:bg-[#0b2a12] hover:text-white lg:flex"
+            onClick={() => setRelatedTourStart((current) => (current - 1 + relatedTours.length) % relatedTours.length)}
+            type="button"
+          >
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+
+          <div
+            className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0"
+          >
+            {visibleRelatedTours.map((item) => (
               <Link
-                className="group relative block min-h-[210px] overflow-hidden rounded-[8px] bg-[#d7e3d8] text-white shadow-[0_16px_34px_rgba(11,42,18,0.12)] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,rgba(7,24,11,0.12),rgba(7,24,11,0.76))]"
+                className="group w-[252px] flex-none snap-start overflow-hidden rounded-[8px] border border-[#0b2a12]/11 bg-white text-[#0b2a12] shadow-[0_12px_28px_rgba(11,42,18,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_34px_rgba(11,42,18,0.14)] sm:w-[280px] lg:w-auto"
                 to={item.path || `/tours/${slugify(item.title)}`}
                 key={item.title}
               >
-                <SafeImage
-                  className="h-full min-h-[210px] w-full object-cover transition duration-500 group-hover:scale-[1.045]"
-                  src={item.image}
-                  alt=""
-                  fallback={gorillaImage}
-                />
-                <span className="absolute bottom-[58px] left-4 right-4 z-[1] text-[11px] font-bold uppercase text-[#d3a14e]">{item.meta}</span>
-                <strong className="absolute bottom-[18px] left-4 right-4 z-[1] text-[17px] font-bold leading-[1.25]">{item.title}</strong>
+                <div className="relative h-[142px] overflow-hidden sm:h-[158px] lg:h-[150px]">
+                  <SafeImage
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.045]"
+                    src={item.image}
+                    alt={item.title}
+                    fallback={gorillaImage}
+                  />
+                  <span className="absolute bottom-3 left-3 rounded-[4px] bg-[#0b2a12]/92 px-2.5 py-1.5 text-[10px] font-bold uppercase text-white shadow-sm">
+                    {item.category}
+                  </span>
+                </div>
+                <div className="flex min-h-[146px] flex-col p-4">
+                  <h3 className="line-clamp-2 min-h-[46px] text-[17px] font-bold leading-[1.35] text-[#0b2a12]">{item.title}</h3>
+                  <p className="mt-3 text-[13px] font-bold text-[#637067]">{item.duration}</p>
+                  <p className="mt-1 text-[13px] text-[#637067]">
+                    From <strong className="text-[15px] font-bold text-[#0b2a12]">{item.price}</strong>
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
+
+          <button
+            aria-label="Show next tours"
+            className="absolute right-0 top-1/2 z-[2] hidden h-11 w-11 translate-x-1/2 items-center justify-center rounded-full border border-[#0b2a12]/10 bg-white text-[#0b2a12] shadow-[0_8px_22px_rgba(11,42,18,0.12)] transition hover:bg-[#0b2a12] hover:text-white lg:flex"
+            onClick={() => setRelatedTourStart((current) => (current + 1) % relatedTours.length)}
+            type="button"
+          >
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
+          </button>
         </section>
       </div>
     </section>

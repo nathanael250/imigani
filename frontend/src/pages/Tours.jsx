@@ -445,15 +445,18 @@ function Tours() {
               </nav>
             )}
 
-            <section className="mt-[34px] flex flex-col items-start justify-between gap-[22px] rounded-[8px] bg-[linear-gradient(90deg,rgba(11,42,18,0.95),rgba(16,47,22,0.9)),#0b2a12] px-[22px] py-[26px] text-white shadow-[0_22px_46px_rgba(11,42,18,0.18)] md:flex-row md:p-[30px_32px]">
-              <div>
+            <section className="mt-[34px] flex flex-col items-start justify-between gap-6 rounded-[8px] bg-[#0b2a12] px-5 py-6 text-white shadow-[0_22px_46px_rgba(11,42,18,0.18)] sm:px-7 sm:py-7 md:flex-row md:items-center md:px-8">
+              <div className="max-w-[560px]">
                 <p className="text-[12px] font-bold uppercase leading-[1.2] text-[#d3a14e]">Need a custom route?</p>
                 <h2 className="mt-2 text-[clamp(24px,2.2vw,32px)] font-bold leading-[1.18]">
                   Can&apos;t find what you&apos;re looking for?
                 </h2>
+                <p className="mt-2.5 max-w-[520px] text-[13px] font-bold leading-[1.65] text-white/75 sm:text-[14px]">
+                  Tell us what you would love to experience and we will shape a private East African journey around you.
+                </p>
               </div>
               <button
-                className="inline-flex min-h-11 w-full flex-none items-center justify-center gap-2 rounded-[5px] bg-white px-[18px] text-[13px] font-bold text-[#0b2a12] transition hover:-translate-y-px hover:bg-[#d3a14e] hover:text-white md:w-auto"
+                className="inline-flex min-h-11 w-full flex-none items-center justify-center gap-2 rounded-[5px] bg-white px-5 text-[13px] font-bold text-[#0b2a12] shadow-sm transition hover:-translate-y-px hover:bg-[#d3a14e] hover:text-white sm:w-auto"
                 type="button"
                 onClick={openPlanVisit}
               >
