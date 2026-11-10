@@ -434,11 +434,11 @@ function Destinations() {
             </p>
           </div>
 
-          <div className="relative mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:grid-rows-[repeat(3,minmax(260px,auto))] sm:gap-[14px] md:grid-rows-[repeat(3,minmax(230px,auto))] lg:min-h-[718px] lg:grid-rows-[repeat(3,230px)]">
+          <div className="relative mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:grid-rows-[repeat(3,minmax(260px,auto))] sm:gap-[14px] md:grid-rows-[repeat(3,minmax(230px,auto))] lg:grid-rows-[minmax(230px,auto)_minmax(230px,auto)_minmax(330px,auto)]">
             {activeDestination.cards.map((card) => (
               <article
                 key={card.location}
-                className={`group relative min-h-[330px] overflow-hidden rounded-xl bg-[#102f16] shadow-[0_22px_54px_rgba(11,42,18,0.12)] isolate ${getDiscoveryCardClass(card.layout)}`}
+                className={`group relative flex items-end overflow-hidden max-sm:min-h-[330px] rounded-xl bg-[#102f16] shadow-[0_22px_54px_rgba(11,42,18,0.12)] isolate ${getDiscoveryCardClass(card.layout)}`}
               >
                 <img
                   className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.045]"
@@ -446,7 +446,7 @@ function Destinations() {
                   alt={card.alt}
                 />
                 <div className="absolute inset-0 z-[1] bg-[linear-gradient(0deg,rgba(3,17,8,0.91)_0%,rgba(3,17,8,0.7)_36%,rgba(3,17,8,0.12)_74%),linear-gradient(90deg,rgba(4,15,6,0.76)_0%,rgba(4,15,6,0.42)_44%,rgba(4,15,6,0.08)_78%)]" />
-                <div className="absolute inset-x-0 bottom-0 z-[2] p-[18px] text-white lg:p-[clamp(15px,1.55vw,20px)]">
+                <div className="relative z-[2] w-full p-[18px] text-white lg:p-[clamp(15px,1.55vw,20px)]">
                   <p className="flex items-center gap-1.5 text-[8px] font-bold uppercase leading-[1.2] text-[#d3a14e]">
                     <MapPin className="h-[13px] w-[13px] flex-none stroke-[2.4]" aria-hidden="true" />
                     <span>{card.location}</span>
