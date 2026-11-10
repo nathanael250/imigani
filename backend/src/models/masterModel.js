@@ -1,5 +1,11 @@
 import commands from "../config/command.js";
 import {
+  createAffiliation,
+  deleteAffiliation,
+  listAffiliations,
+  updateAffiliation,
+} from "./affiliationModel.js";
+import {
   createBlogPost,
   deleteBlogPost,
   getBlogPost,
@@ -56,6 +62,11 @@ const requestHandlers = {
   "system.requests": () => listAvailableRequests(),
   "auth.login": loginUser,
   "media.upload": uploadMedia,
+
+  "affiliations.create": createAffiliation,
+  "affiliations.delete": deleteAffiliation,
+  "affiliations.list": listAffiliations,
+  "affiliations.update": updateAffiliation,
 
   "dashboard.summary": getDashboardSummary,
 
@@ -121,6 +132,11 @@ const commandToRequest = {
   [commands.HEALTH]: "health",
   [commands.LOGIN]: "auth.login",
   [commands.UPLOAD_MEDIA]: "media.upload",
+
+  [commands.LIST_AFFILIATIONS]: "affiliations.list",
+  [commands.CREATE_AFFILIATION]: "affiliations.create",
+  [commands.UPDATE_AFFILIATION]: "affiliations.update",
+  [commands.DELETE_AFFILIATION]: "affiliations.delete",
 
   [commands.DASHBOARD_SUMMARY]: "dashboard.summary",
 

@@ -10,11 +10,14 @@ import {
   Sparkles,
   UsersRound,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DestinationCard from '../components/DestinationCard.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import heroGorilla from '../assets/gollira.png'
+import attaLogo from '../assets/affiliations/atta logo.png'
+import rttaLogo from '../assets/affiliations/RTTA.jpeg'
+import visitRwandaLogo from '../assets/affiliations/visit_rwanda_logo.png'
 import destinationKenyaImage from '../assets/Destinations/Kenya.png'
 import destinationRwandaImage from '../assets/Destinations/rd.png'
 import destinationTanzaniaImage from '../assets/Destinations/Tanzania.png'
@@ -24,8 +27,32 @@ import rwandaImage from '../assets/Rwanda.png'
 import safariImage from '../assets/young-mountain-gorilla-virunga-national-park-africa-drc-central-africa_191971-22582.avif'
 import tanzaniaImage from '../assets/Tanzania.png'
 import ugandaImage from '../assets/Uganda.png'
+import { listAffiliations } from '../services/affiliationService.js'
 
+const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:6003').replace(/\/$/, '')
 const heroSlides = [safariImage, heroGorilla, rwandaImage, ugandaImage, kenyaImage]
+const heroTypewriterPhrases = ['Welcome to IMIGANI SAFARIS AND TOURS', 'Adventure Storytelling']
+
+const fallbackAffiliations = [
+  {
+    name: 'Rwanda Tours and Travel Association',
+    slug: 'rtta',
+  },
+  {
+    name: 'African Travel & Tourism Association',
+    slug: 'atta',
+  },
+  {
+    name: 'Visit Rwanda',
+    slug: 'visit-rwanda',
+  },
+]
+
+const affiliationFallbackLogos = {
+  atta: attaLogo,
+  rtta: rttaLogo,
+  'visit-rwanda': visitRwandaLogo,
+}
 
 const whyItems = [
   {
@@ -134,10 +161,71 @@ const destinations = [
 
 function Home() {
   const visibleExperienceCount = 4
+  const prefersReducedMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const [experienceStart, setExperienceStart] = useState(0)
+  const [managedAffiliations, setManagedAffiliations] = useState(fallbackAffiliations)
+  const [heroPhraseIndex, setHeroPhraseIndex] = useState(0)
+  const [heroTypedText, setHeroTypedText] = useState(() =>
+    prefersReducedMotion ? heroTypewriterPhrases[0] : '',
+  )
+  const [isHeroDeleting, setIsHeroDeleting] = useState(false)
   const visibleExperiences = Array.from({ length: visibleExperienceCount }, (_, index) => {
     return experiences[(experienceStart + index) % experiences.length]
   })
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadManagedAffiliations() {
+      try {
+        const rows = await listAffiliations({ filters: { status: 'active' }, limit: 50 })
+        if (isMounted) setManagedAffiliations(Array.isArray(rows) ? rows : [])
+      } catch {
+        if (isMounted) setManagedAffiliations(fallbackAffiliations)
+      }
+    }
+
+    loadManagedAffiliations()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    const activePhrase = heroTypewriterPhrases[heroPhraseIndex]
+
+    if (prefersReducedMotion) {
+      return undefined
+    }
+
+    let delay = isHeroDeleting ? 50 : 90
+
+    if (!isHeroDeleting && heroTypedText === activePhrase) {
+      delay = 3000
+    } else if (isHeroDeleting && heroTypedText === '') {
+      delay = 420
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (!isHeroDeleting && heroTypedText === activePhrase) {
+        setIsHeroDeleting(true)
+        return
+      }
+
+      if (isHeroDeleting && heroTypedText === '') {
+        setIsHeroDeleting(false)
+        setHeroPhraseIndex((current) => (current + 1) % heroTypewriterPhrases.length)
+        return
+      }
+
+      const nextLength = heroTypedText.length + (isHeroDeleting ? -1 : 1)
+      setHeroTypedText(activePhrase.slice(0, nextLength))
+    }, delay)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [heroPhraseIndex, heroTypedText, isHeroDeleting, prefersReducedMotion])
 
   const showPreviousExperiences = () => {
     setExperienceStart((current) => (current === 0 ? experiences.length - 1 : current - 1))
@@ -169,7 +257,16 @@ function Home() {
           <div className="max-w-[690px]">
             <h1 className="text-[34px] font-bold leading-[1.18] text-white sm:text-[54px]">
               Muraho Neza!
-              <span className="mt-1 block">Welcome to IMIGANI.</span>
+              <span
+                className="mt-1 block min-h-[1.18em] whitespace-nowrap text-[14px] min-[375px]:text-[16px] min-[420px]:text-[18px] sm:text-[28px] lg:text-[34px]"
+                aria-hidden="true"
+              >
+                {heroTypedText}
+                {!prefersReducedMotion ? (
+                  <span className="ml-1 inline-block h-[0.92em] w-[3px] animate-[pulse_1s_steps(1,end)_infinite] bg-[#d3a14e] align-[-0.06em]" />
+                ) : null}
+              </span>
+              <span className="sr-only">Welcome to IMIGANI Safaris and Tours. Adventure storytelling.</span>
             </h1>
             <p className="mt-7 max-w-[690px] whitespace-pre-line text-[14px] font-medium leading-[1.72] text-white/92 sm:text-[18px] sm:leading-[1.85]">
               {`IMIGANI Safaris and Tours is a boutique East African travel company rooted in Rwanda, creating authentic and meaningful journeys across Rwanda, Uganda, Kenya, and Tanzania.
@@ -325,8 +422,62 @@ From wildlife and adventure to culture, education, and leisure, we thoughtfully 
           </div>
         </div>
       </section>
+
+      {managedAffiliations.length > 0 ? (
+        <section className="border-y border-[#0b2a12]/8 bg-[#f5f8f3] px-5 py-14 sm:py-[68px]" aria-labelledby="affiliations-title">
+          <div className="mx-auto max-w-[1120px]">
+            <div id="affiliations-title">
+              <SectionHeading title="Partners & Affiliations" />
+            </div>
+
+            <div className="mx-auto mt-9 grid max-w-[900px] grid-cols-1 gap-4 sm:mt-11 sm:grid-cols-3 sm:gap-5">
+              {managedAffiliations.map((affiliation) => {
+                const logo = publicMediaUrl(affiliation.logo_url) || affiliationFallbackLogos[affiliation.slug]
+                const PartnerElement = affiliation.website_url ? 'a' : 'div'
+
+                return (
+                  <PartnerElement
+                    className="group rounded-[8px] outline-none transition hover:-translate-y-1 focus-visible:ring-4 focus-visible:ring-[#d3a14e]/30"
+                    href={affiliation.website_url ? normalizeExternalUrl(affiliation.website_url) : undefined}
+                    key={affiliation.id || affiliation.slug}
+                    rel={affiliation.website_url ? 'noreferrer' : undefined}
+                    target={affiliation.website_url ? '_blank' : undefined}
+                  >
+                    <figure className="flex min-h-[150px] h-full items-center justify-center rounded-[8px] border border-[#0b2a12]/10 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(11,42,18,0.06)] transition group-hover:border-[#d3a14e]/45 group-hover:shadow-[0_18px_36px_rgba(11,42,18,0.1)] sm:min-h-[180px] sm:px-6">
+                      {logo ? (
+                        <img
+                          alt={`${affiliation.name} logo`}
+                          className={`${affiliationImageClass(affiliation.slug)} flex-none object-contain`}
+                          loading="lazy"
+                          src={logo}
+                        />
+                      ) : null}
+                    </figure>
+                  </PartnerElement>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </div>
   )
 }
 
 export default Home
+
+function publicMediaUrl(url) {
+  if (!url || url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) return url
+  return url.startsWith('/uploads') ? `${apiBaseUrl}${url}` : url
+}
+
+function affiliationImageClass(slug) {
+  if (slug === 'rtta') return 'h-[112px] w-[112px] sm:h-[126px] sm:w-[126px]'
+  if (slug === 'atta') return 'h-[94px] w-[150px] sm:h-[108px] sm:w-[172px]'
+  if (slug === 'visit-rwanda') return 'h-[104px] w-[104px] sm:h-[118px] sm:w-[118px]'
+  return 'h-[96px] w-[150px] sm:h-[112px] sm:w-[176px]'
+}
+
+function normalizeExternalUrl(url) {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`
+}

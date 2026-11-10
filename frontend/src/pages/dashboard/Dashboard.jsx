@@ -2,6 +2,7 @@ import {
   AlignCenter,
   AlignLeft,
   AlignRight,
+  ArrowLeft,
   Bell,
   Bold,
   CalendarCheck,
@@ -12,6 +13,7 @@ import {
   Globe2,
   Heading1,
   Heading2,
+  Handshake,
   ImagePlus,
   Italic,
   LayoutDashboard,
@@ -35,7 +37,17 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import logoImage from "../../assets/imigani tours.png";
+import attaLogo from "../../assets/affiliations/atta logo.png";
+import rttaLogo from "../../assets/affiliations/RTTA.jpeg";
+import visitRwandaLogo from "../../assets/affiliations/visit_rwanda_logo.png";
 import { getCurrentUser, logout } from "../../services/authService";
+import {
+  createAffiliation,
+  deleteAffiliation,
+  listAffiliations,
+  updateAffiliation,
+  uploadAffiliationLogo,
+} from "../../services/affiliationService.js";
 import {
   createBlogPost,
   deleteBlogPost,
@@ -70,6 +82,7 @@ const navItems = [
   { label: "Tour packages", href: "/dashboard/tour-packages", icon: Package },
   { label: "Tour categories", href: "/dashboard/tour-categories", icon: Tags },
   { label: "Destinations", href: "/dashboard/destinations", icon: MapPinned },
+  { label: "Affiliations", href: "/dashboard/affiliations", icon: Handshake },
   { label: "Reviews", href: "/dashboard/reviews", icon: Star },
   { label: "Blogs", href: "/dashboard/blogs", icon: PenLine },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -402,6 +415,7 @@ function Dashboard() {
           <Route path="tour-categories" element={<TourCategoriesPage />} />
           <Route path="tour-packages/new" element={<TourPackageBuilder />} />
           <Route path="tour-packages/:id/edit" element={<TourPackageBuilder />} />
+          <Route path="affiliations" element={<AffiliationsPage />} />
           <Route path="reviews" element={<ReviewsPage />} />
           <Route path="blogs" element={<BlogsPage />} />
           <Route path="settings" element={<SettingsPage />} />
@@ -1170,6 +1184,319 @@ function BookingsPage() {
         />
       )}
     </DashboardListPage>
+  );
+}
+
+const defaultAffiliationLogos = {
+  atta: attaLogo,
+  rtta: rttaLogo,
+  "visit-rwanda": visitRwandaLogo,
+};
+
+const emptyAffiliationForm = {
+  logo_url: "",
+  name: "",
+  slug: "",
+  sort_order: 0,
+  status: "active",
+  website_url: "",
+};
+
+function AffiliationsPage() {
+  const [affiliations, setAffiliations] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState(emptyAffiliationForm);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    return loadRows(listAffiliations, setAffiliations, setIsLoading, setError);
+  }, []);
+
+  function resetForm() {
+    setEditingId(null);
+    setForm(emptyAffiliationForm);
+    setError("");
+    setIsCreating(false);
+  }
+
+  function handleCreateNew() {
+    setEditingId(null);
+    setForm({ ...emptyAffiliationForm, sort_order: affiliations.length + 1 });
+    setError("");
+    setIsCreating(true);
+  }
+
+  function handleEdit(affiliation) {
+    setEditingId(affiliation.id);
+    setForm({
+      logo_url: affiliation.logo_url || "",
+      name: affiliation.name || "",
+      slug: affiliation.slug || "",
+      sort_order: Number(affiliation.sort_order || 0),
+      status: affiliation.status || "active",
+      website_url: affiliation.website_url || "",
+    });
+    setError("");
+    setIsCreating(true);
+  }
+
+  async function handleLogoUpload(file) {
+    if (!file) return;
+
+    setError("");
+    setIsUploading(true);
+
+    try {
+      const result = await uploadAffiliationLogo(file);
+      if (!result.file?.url) throw new Error("The logo uploaded, but no file URL was returned.");
+      setFormValue(setForm, "logo_url", result.file.url);
+    } catch (uploadError) {
+      setError(uploadError.message || "Unable to upload affiliation logo");
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  async function handleSave(event) {
+    event.preventDefault();
+
+    if (!form.logo_url && !editingId) {
+      setError("Please upload a logo before saving this affiliation.");
+      return;
+    }
+
+    setIsSaving(true);
+    setError("");
+
+    try {
+      const payload = {
+        logo_url: form.logo_url,
+        name: form.name.trim(),
+        slug: editingId ? form.slug : slugify(form.name),
+        sort_order: Number(form.sort_order || 0),
+        status: form.status,
+        website_url: form.website_url.trim(),
+      };
+      const saved = editingId
+        ? await updateAffiliation(editingId, payload)
+        : await createAffiliation(payload);
+
+      setAffiliations((current) => sortAffiliations(
+        editingId
+          ? current.map((item) => (item.id === editingId ? { ...item, ...saved } : item))
+          : [...current, saved],
+      ));
+      resetForm();
+    } catch (saveError) {
+      setError(saveError.message || "Unable to save affiliation");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleStatusChange(id, status) {
+    setError("");
+
+    try {
+      const updated = await updateAffiliation(id, { status });
+      setAffiliations((current) => current.map((item) => (item.id === id ? { ...item, ...updated } : item)));
+    } catch (statusError) {
+      setError(statusError.message || "Unable to update affiliation status");
+    }
+  }
+
+  async function handleDelete(affiliation) {
+    if (!window.confirm(`Remove "${affiliation.name}" from affiliations?`)) return;
+
+    setError("");
+    try {
+      await deleteAffiliation(affiliation.id);
+      setAffiliations((current) => current.filter((item) => item.id !== affiliation.id));
+      if (editingId === affiliation.id) resetForm();
+    } catch (deleteError) {
+      setError(deleteError.message || "Unable to remove affiliation");
+    }
+  }
+
+  const formLogo = mediaPreviewUrl(form.logo_url) || defaultAffiliationLogos[form.slug || slugify(form.name)];
+
+  return (
+    <section className="grid gap-4" aria-label="Affiliations">
+      <div className={sectionHeadingClass}>
+        <div>
+          {sectionEyebrow("Website content")}
+          <h2 className="m-0 text-[clamp(26px,2.5vw,38px)] font-semibold leading-tight text-[#0d3518]">Partners &amp; Affiliations</h2>
+          <p className="mt-2 text-sm font-medium text-[#687265]">Manage the partner logos displayed near the bottom of the homepage.</p>
+        </div>
+        <button
+          className={primaryLinkClass}
+          type="button"
+          onClick={() => (isCreating ? resetForm() : handleCreateNew())}
+        >
+          {isCreating ? <ArrowLeft className="h-4 w-4" aria-hidden="true" /> : <Plus className="h-4 w-4" aria-hidden="true" />}
+          {isCreating ? "Back to Affiliations" : "Add Affiliation"}
+        </button>
+      </div>
+
+      {isCreating && (
+        <form className={`${panelClass} grid gap-5`} onSubmit={handleSave}>
+          <div>
+            <h3 className="text-xl font-bold text-[#0b2a12]">{editingId ? "Edit Affiliation" : "Add Affiliation"}</h3>
+            <p className="mt-1 text-[13px] font-medium text-[#687265]">Upload a clear logo with a transparent or white background for the best result.</p>
+          </div>
+
+          {error && <p className={inlineErrorClass}>{error}</p>}
+
+          <div className="grid gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
+            <div className="grid gap-2 text-sm font-bold text-[#0b2a12]">
+              <span>Logo</span>
+              <label
+                className="grid min-h-[210px] cursor-pointer place-items-center content-center gap-3 rounded-[8px] border border-dashed border-[#cfd9cb] bg-[#f8faf6] p-5 text-center transition hover:border-[#d3a14e]"
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  handleLogoUpload(event.dataTransfer.files?.[0]);
+                }}
+              >
+                {formLogo ? (
+                  <img className="h-[120px] w-[180px] object-contain" src={formLogo} alt="Affiliation preview" />
+                ) : (
+                  <ImagePlus className="h-10 w-10 text-[#315a3c]" aria-hidden="true" />
+                )}
+                <span className="text-[12px] font-bold text-[#687265]">
+                  {isUploading ? "Uploading logo..." : "Click or drag an image here"}
+                </span>
+                <input
+                  className="sr-only"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  disabled={isUploading}
+                  onChange={(event) => {
+                    handleLogoUpload(event.target.files?.[0]);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
+
+            <div className="grid content-start gap-4 sm:grid-cols-2">
+              <label className={`${formLabelClass} sm:col-span-2`}>
+                Organization Name
+                <input
+                  className={formInputClass}
+                  placeholder="Tourism organization"
+                  value={form.name}
+                  onChange={(event) => setFormValue(setForm, "name", event.target.value)}
+                  required
+                />
+              </label>
+              <label className={`${formLabelClass} sm:col-span-2`}>
+                Website URL
+                <input
+                  className={formInputClass}
+                  placeholder="https://example.com"
+                  type="url"
+                  value={form.website_url}
+                  onChange={(event) => setFormValue(setForm, "website_url", event.target.value)}
+                />
+              </label>
+              <label className={formLabelClass}>
+                Display Order
+                <input
+                  className={formInputClass}
+                  min="0"
+                  type="number"
+                  value={form.sort_order}
+                  onChange={(event) => setFormValue(setForm, "sort_order", event.target.value)}
+                />
+              </label>
+              <label className={formLabelClass}>
+                Status
+                <select className={formInputClass} value={form.status} onChange={(event) => setFormValue(setForm, "status", event.target.value)}>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap justify-end gap-3">
+            <button className={secondaryLinkClass} type="button" onClick={resetForm}>Cancel</button>
+            <button className={primaryLinkClass} type="submit" disabled={isSaving || isUploading}>
+              {isSaving ? "Saving..." : editingId ? "Save Changes" : "Add Affiliation"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {!isCreating && (
+        <DashboardListPage
+          title="All Affiliations"
+          description="Active affiliations are shown on the homepage in this display order."
+          emptyIcon={Handshake}
+          emptyTitle="No affiliations yet"
+          emptyText="Add a tourism partner to display it on the homepage."
+          error={error}
+          isLoading={isLoading}
+          rows={affiliations}
+        >
+          <div className={tableWrapClass}>
+            <table className={tableClass}>
+              <thead>
+                <tr>
+                  <th>Logo</th>
+                  <th>Organization</th>
+                  <th>Website</th>
+                  <th>Order</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {affiliations.map((affiliation) => {
+                  const logo = mediaPreviewUrl(affiliation.logo_url) || defaultAffiliationLogos[affiliation.slug];
+
+                  return (
+                    <tr key={affiliation.id}>
+                      <td>
+                        <div className="grid h-14 w-20 place-items-center overflow-hidden rounded-md border border-[#e1e7dc] bg-white p-1.5">
+                          {logo ? <img className="h-full w-full object-contain" src={logo} alt="" /> : <ImagePlus className="h-6 w-6 text-[#809083]" aria-hidden="true" />}
+                        </div>
+                      </td>
+                      <td><strong className="block min-w-[210px] text-[13px] font-semibold text-[#102616]">{affiliation.name}</strong></td>
+                      <td>
+                        {affiliation.website_url ? (
+                          <a className="inline-flex items-center gap-1.5 text-[12px] font-bold text-[#855113] hover:text-[#0b2a12]" href={normalizeExternalHref(affiliation.website_url)} target="_blank" rel="noreferrer">
+                            Visit website <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                          </a>
+                        ) : <span className="text-[12px] font-medium text-[#7b857d]">Not added</span>}
+                      </td>
+                      <td>{affiliation.sort_order}</td>
+                      <td>
+                        <select className={requestStatusClass} value={affiliation.status} onChange={(event) => handleStatusChange(affiliation.id, event.target.value)}>
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      </td>
+                      <td>
+                        <div className={tableActionClass}>
+                          <button className={secondaryLinkClass} type="button" onClick={() => handleEdit(affiliation)}>Edit</button>
+                          <button className={dangerLinkClass} type="button" onClick={() => handleDelete(affiliation)}>Remove</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </DashboardListPage>
+      )}
+    </section>
   );
 }
 
@@ -1992,6 +2319,13 @@ function loadRows(loader, setter, setIsLoading, setError) {
 
 function setFormValue(setter, key, value) {
   setter((current) => ({ ...current, [key]: value }));
+}
+
+function sortAffiliations(rows) {
+  return [...rows].sort((left, right) => {
+    const orderDifference = Number(left.sort_order || 0) - Number(right.sort_order || 0);
+    return orderDifference || String(left.name || "").localeCompare(String(right.name || ""));
+  });
 }
 
 function slugify(value) {

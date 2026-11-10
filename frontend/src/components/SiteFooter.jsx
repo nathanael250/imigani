@@ -9,6 +9,7 @@ const quickLinks = [
   { href: '/tours', label: 'Tours & Safaris' },
   { href: '/tours', label: 'Experiences' },
   { href: '/blog', label: 'Blog' },
+  { href: '/faq', label: 'FAQ' },
   { href: '/contact-us', label: 'Contact Us' },
 ]
 

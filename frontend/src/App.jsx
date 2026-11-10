@@ -8,6 +8,7 @@ import Blog from './pages/Blog.jsx'
 import BlogDetail from './pages/BlogDetail.jsx'
 import ContactUs from './pages/ContactUs.jsx'
 import Destinations from './pages/Destinations.jsx'
+import Faq from './pages/Faq.jsx'
 import Home from './pages/Home.jsx'
 import TourDetail from './pages/TourDetail.jsx'
 import Tours from './pages/Tours.jsx'
@@ -29,6 +30,7 @@ function App() {
               <Route path="/blog/:slug" element={<PageLayout page={<BlogDetail />} />} />
               <Route path="/contact-us" element={<PageLayout page={<ContactUs />} />} />
               <Route path="/destinations" element={<PageLayout page={<Destinations />} />} />
+              <Route path="/faq" element={<PageLayout page={<Faq />} />} />
               <Route path="/tours" element={<PageLayout page={<Tours />} />} />
               <Route path="/tours/:id" element={<PageLayout page={<TourDetail />} />} />
               <Route path="/login" element={<PublicOnlyRoute page={<Login />} />} />

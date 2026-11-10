@@ -8,6 +8,7 @@ import {
   Target,
   UsersRound,
 } from 'lucide-react'
+import FaqAccordion from '../components/FaqAccordion.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import VisionCard from '../components/VisionCard.jsx'
 import { usePlanVisit } from '../contexts/PlanVisitContext.jsx'
@@ -178,6 +179,20 @@ function AboutUs() {
             src={planJourneyImage}
             alt="Traveler planning an East African journey"
           />
+        </div>
+      </section>
+
+      <section className="border-y border-[#0b2a12]/8 bg-[#f5f8f3] px-5 py-[68px] sm:py-[82px]" aria-labelledby="faq-heading">
+        <div className="mx-auto max-w-[920px]">
+          <div id="faq-heading">
+            <SectionHeading title="Frequently Asked Questions" />
+          </div>
+          <p className="mx-auto mt-5 max-w-[650px] text-center text-[14px] font-medium leading-[1.7] text-[#637069] sm:text-[16px]">
+            Helpful answers as you begin imagining and planning your East African journey.
+          </p>
+          <div className="mt-9 sm:mt-11">
+            <FaqAccordion idPrefix="about-faq" />
+          </div>
         </div>
       </section>
     </>
